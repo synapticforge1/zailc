@@ -22,7 +22,7 @@ generators; a user's `zig build` may rely on Zig alone, so they become Zig.
   The signature tables are not typed by hand: `tools/gen/import-signatures.ts` derives them from
   upstream's file, so an upstream change is a re-run, not a transcription.
 - `zig build test` proves the bytes (SHA-256 of both outputs against Ruby's);
-  `deno run -A tools/gen/verify-forwarders.ts` proves them again against a live Ruby run.
+  `bun run tools/gen/verify-forwarders.ts` proves them again against a live Ruby run.
 - `zailc-gen musl-headers`: **musl's `make install-headers` in Zig** (the `yolo-include` tree
   libpas compiles against), byte-identical to upstream's, 219 files.
 - `zig build libpas -Dfilc-src=<Fil-C tree>`: **the stock-compiled half of Fil-C's runtime from
@@ -43,7 +43,7 @@ zig build            # builds zig-out/bin/zailc-gen
 zig build test       # the byte-identity tests
 zig build gen -- header out/filc_native.h
 zig build gen -- forwarders out/filc_native_forwarders.c
-deno run -A tools/gen/verify-forwarders.ts   # diff against Ruby (needs ruby and a Fil-C source tree)
+bun run tools/gen/verify-forwarders.ts       # diff against Ruby (needs ruby and a Fil-C source tree)
 ```
 
 ## Layout
@@ -52,7 +52,7 @@ deno run -A tools/gen/verify-forwarders.ts   # diff against Ruby (needs ruby and
 zailc/
 ├── build.zig, build.zig.zon   # Zig 0.15.2
 ├── src/gen/                   # the generators (step 2): sig.zig, signatures.zig (imported), forwarders.zig, main.zig
-├── tools/                     # Deno tools: lib/tool.ts (shared), gen/import-signatures.ts, gen/verify-forwarders.ts
+├── tools/                     # Bun tools: lib/tool.ts (shared), gen/import-signatures.ts, gen/verify-forwarders.ts
 ├── tests/link/                # programs linked against upstream's runtime and ours (tools/runtime/link-run.ts)
 ├── tests/upstream/            # one reproduction per upstream defect found (UPSTREAM-ISSUES.md)
 ├── cmem/                      # portable project memory: start at cmem/INDEX.md

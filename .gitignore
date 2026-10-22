@@ -3,3 +3,6 @@
 .zig-cache/
 zig-out/
 *.o
+# The tools' type-check installs into a copy in ~/zailc-work (tools/dev/typecheck.ts); this catches
+# an install run in the checkout itself.
+node_modules/

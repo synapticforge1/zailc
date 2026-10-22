@@ -5,6 +5,8 @@
 // lose some), the global symbols an object defines and the ones it leaves undefined (`nm`), and the
 // source paths it carries in its read-only data (`__FILE__`, W-6).
 
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { must } from "../../lib/tool.ts";
 
 export interface Member { name: string; data: Uint8Array }
@@ -108,10 +110,10 @@ export class Oracle {
 
   /** Two archives member by member, paired by POSITION (names can repeat) and checked by stem. */
   async archives(label: string, oursPath: string, theirsPath: string): Promise<number> {
-    const ours = readArchive(await Deno.readFile(oursPath));
-    const theirs = readArchive(await Deno.readFile(theirsPath));
+    const ours = readArchive(await readFile(oursPath));
+    const theirs = readArchive(await readFile(theirsPath));
     if (ours.length !== theirs.length) this.fail(`MEMBER COUNT  ${label}: ours ${ours.length}, upstream's ${theirs.length}`);
-    const tmp = await Deno.makeTempDir();
+    const tmp = await mkdtemp(`${tmpdir()}/zailc-`);
     let compared = 0;
     try {
       for (let i = 0; i < Math.min(ours.length, theirs.length); i++) {
@@ -120,13 +122,13 @@ export class Oracle {
           this.fail(`MEMBER ORDER  ${label} #${i}: ours ${a}, upstream's ${t}`);
           continue;
         }
-        await Deno.writeFile(`${tmp}/a.o`, ours[i].data);
-        await Deno.writeFile(`${tmp}/b.o`, theirs[i].data);
+        await writeFile(`${tmp}/a.o`, ours[i].data);
+        await writeFile(`${tmp}/b.o`, theirs[i].data);
         await this.pair(`${label} #${i} ${t}`, `${tmp}/a.o`, `${tmp}/b.o`);
         compared++;
       }
     } finally {
-      await Deno.remove(tmp, { recursive: true });
+      await rm(tmp, { recursive: true });
     }
     return compared;
   }
@@ -175,10 +177,11 @@ export async function compileUnitNames(obj: string): Promise<string[]> {
 
 /** Source paths in an object's read-only data (`__FILE__`); a path has a `/`, a string tail does not. */
 export async function sourcePaths(obj: string): Promise<Set<string>> {
-  const tmp = await Deno.makeTempFile();
+  const dir = await mkdtemp(`${tmpdir()}/zailc-`);
+  const tmp = `${dir}/rodata`;
   try {
     await must(["objcopy", "-O", "binary", "--only-section=.rodata*", obj, tmp]);
-    const bytes = await Deno.readFile(tmp);
+    const bytes = await readFile(tmp);
     const found = new Set<string>();
     let cur = "";
     for (const c of bytes) {
@@ -190,6 +193,6 @@ export async function sourcePaths(obj: string): Promise<Set<string>> {
     }
     return found;
   } finally {
-    await Deno.remove(tmp);
+    await rm(dir, { recursive: true });
   }
 }

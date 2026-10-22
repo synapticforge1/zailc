@@ -79,7 +79,7 @@ this repo concurrently: re-read `git log` before merging into `main`.
                                         # CI runs, auto-tag finds the tag exists, nothing ships
 3. unreleased.md says PATCH or MINOR; the owner decides to ship
    (the first release only: the owner also opens .github/release-gate, closed -> open)
-4. deno run -A tools/release/bump.ts [patch|minor]   # edits build.zig.zon only
+4. bun run tools/release/bump.ts [patch|minor]       # edits build.zig.zon only
 5. move unreleased.md's entries into CHANGELOG.md § X.Y.Z
 6. commit 4+5 on a branch, merge --no-ff -> main     # the arming commit, on its own
 7. git push origin main                 # auto-tag tags vX.Y.Z and publish.yml releases it

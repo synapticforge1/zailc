@@ -8,7 +8,7 @@
 //                 compile-unit names as upstream's (neither build has debug info: Release, no -g).
 //   crtbegin.o crtend.o   the same checks.
 //
-//   deno run -A tools/runtime/verify-compiler-rt.ts      (from Windows or Linux; runs in WSL)
+//   bun run tools/runtime/verify-compiler-rt.ts     (from Windows or Linux; runs in WSL)
 
 import { REPO, WORK, existsSync, filcPrebuilt, linuxOnly, requireFilcSrc, run, zig, zigCacheArgs } from "../lib/tool.ts";
 import { Oracle } from "./lib/objects.ts";
@@ -41,7 +41,7 @@ const DEPARTED_BUDGET = 2; // W-10's two extra definitions
 const b = await run([zig(), "build", "compiler-rt", `-Dfilc-src=${src}`, "--prefix", prefix, ...zigCacheArgs()], { cwd: REPO, inherit: true });
 if (b.code !== 0) {
   console.log("FAILED: zig build compiler-rt");
-  Deno.exit(1);
+  process.exit(1);
 }
 
 const compared = await oracle.archives("libyolort.a", `${prefix}/lib/libyolort.a`, `${theirLib}/libyolort.a`);
@@ -56,4 +56,4 @@ oracle.ratchet("DEPARTED-DEFINED", oracle.departedDefined, DEPARTED_BUDGET);
 console.log(`W-10 departure: ${oracle.departedDefined} symbols defined only by ours (budget ${DEPARTED_BUDGET})`);
 oracle.ratchet("EMPTY-TU", oracle.emptyTu, 0);
 console.log(oracle.failures ? `FAILED: ${oracle.failures}` : "OK: libyolort.a and crtbegin.o / crtend.o define exactly upstream's symbols, in upstream's member order");
-Deno.exit(oracle.failures ? 1 : 0);
+process.exit(oracle.failures ? 1 : 0);

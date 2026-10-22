@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR MIT
 //
-// Shared helpers for zailc's tools (Deno). Adapted from zilc's tools/lib/tool.ts (same author).
+// Shared helpers for zailc's tools (Bun). Adapted from zilc's tools/lib/tool.ts (same author).
 //
 // A tool is written ONCE, as code for the platform its work needs:
 //   * Tools whose work needs Linux (Fil-C, Ruby, the Zig 0.15.2 install) call `linuxOnly()`
@@ -9,11 +9,16 @@
 //     wsl.exe as an argument list, never through a shell's quoting.
 //   * NOTHING a tool builds is ever executed on the Windows host (cmem/best-practices.md).
 //
-// Run a tool:   deno run -A tools/<group>/<tool>.ts [args]      (from Windows or from Linux)
+// Run a tool:   bun run tools/<group>/<tool>.ts [args]      (from Windows or from Linux)
 
-import { dirname, fromFileUrl, join } from "jsr:@std/path@1";
+import { existsSync } from "node:fs";
+import { mkdir, rm } from "node:fs/promises";
+import { join } from "node:path";
+import { constants } from "node:os";
 
-export const isWindows = Deno.build.os === "windows";
+export { existsSync };
+
+export const isWindows = process.platform === "win32";
 
 /** Forward slashes on every OS (Windows accepts them). */
 export function slashes(p: string): string {
@@ -21,11 +26,11 @@ export function slashes(p: string): string {
 }
 
 /** The repository root (this file is tools/lib/tool.ts). */
-export const REPO = slashes(join(dirname(fromFileUrl(import.meta.url)), "..", ".."));
+export const REPO = slashes(join(import.meta.dir, "..", ".."));
 
 /** An environment variable, or a default. */
 export function env(name: string, fallback = ""): string {
-  return Deno.env.get(name) ?? fallback;
+  return process.env[name] ?? fallback;
 }
 
 export const HOME = env("HOME", env("USERPROFILE"));
@@ -38,7 +43,7 @@ export const FILC_SHA = "163fae598eaf249b74065b0156f3a7e7ba8c0e5a";
 
 /** Zig 0.15.2: ZAILC_ZIG, else zailc's own install, else the one zilc's WSL setup installed. */
 export function zig(): string {
-  const set = Deno.env.get("ZAILC_ZIG");
+  const set = process.env.ZAILC_ZIG;
   if (set) return set;
   const own = `${WORK}/tools/zig-0.15.2/zig`;
   return existsSync(own) ? own : `${HOME}/zilc-work/tools/zig-0.15.2/zig`;
@@ -55,7 +60,7 @@ export function zigCacheArgs(): string[] {
  * libpas's generators, found 2026-10-08).
  */
 export function filcSrc(): string {
-  const set = Deno.env.get("ZAILC_FILC_SRC");
+  const set = process.env.ZAILC_FILC_SRC;
   if (set) return set;
   const own = `${WORK}/filc-src`;
   return existsSync(own) ? own : `${HOME}/zilc-work/filc-cosmo`;
@@ -66,7 +71,7 @@ export function filcSrc(): string {
  * the runtime's objects and libraries. ZAILC_FILC_PREBUILT, else the one zilc's WSL setup unpacked.
  */
 export function filcPrebuilt(): string {
-  return Deno.env.get("ZAILC_FILC_PREBUILT") ?? `${HOME}/zilc-work/tools/filc-${FILC_VERSION}-linux-x86_64`;
+  return process.env.ZAILC_FILC_PREBUILT ?? `${HOME}/zilc-work/tools/filc-${FILC_VERSION}-linux-x86_64`;
 }
 
 /** Throws unless `dir` is a git checkout at FILC_SHA. */
@@ -88,29 +93,30 @@ const FORWARD = /^(ZAILC_|ZIG_|FILC_)|^(JOBS|WORK|VERBOSE)$/;
 
 /**
  * For tools whose work needs Linux. Call it first in the tool's body. On Linux: returns. On
- * Windows: runs this same tool inside WSL (Deno at ~/.deno/bin/deno there) and exits with its
+ * Windows: runs this same tool inside WSL (Bun at ~/.bun/bin/bun there) and exits with its
  * status; the caller never continues.
  */
 export async function linuxOnly(meta: ImportMeta): Promise<void> {
-  if (Deno.build.os === "linux") return;
-  if (!isWindows) throw new Error(`${meta.url}: needs Linux, or Windows with WSL`);
-  const script = wslPath(slashes(fromFileUrl(meta.url)));
+  if (process.platform === "linux") return;
+  if (!isWindows) throw new Error(`${meta.path}: needs Linux, or Windows with WSL`);
+  const script = wslPath(slashes(meta.path));
   // A Windows path (`C:\…`, `C:/…`) is never right inside WSL: Windows' own ZIG_LOCAL_CACHE_DIR
   // reached a WSL `zig cc` as a relative directory name and broke CMake's compiler detection
   // (cmem/workarounds.md W-9). Such values are not forwarded, and the tool says so.
   const isWindowsPath = (v: string) => /^[A-Za-z]:[\\/]/.test(v);
-  const env = Object.entries(Deno.env.toObject()).filter(([k]) => FORWARD.test(k));
+  const env = Object.entries(process.env).filter((e): e is [string, string] => FORWARD.test(e[0]) && e[1] !== undefined);
   for (const [k, v] of env) if (isWindowsPath(v)) console.error(`note: not forwarding ${k}=${v} into WSL (a Windows path)`);
   const fwd = env.filter(([, v]) => !isWindowsPath(v)).map(([k, v]) => `${k}=${v}`);
-  const { code } = await new Deno.Command("wsl.exe", {
-    args: ["-e", "env", ...fwd, "sh", "-c", 'exec "$HOME/.deno/bin/deno" run -A "$0" "$@"', script, ...Deno.args],
-    stdin: "inherit", stdout: "inherit", stderr: "inherit",
-  }).output();
-  Deno.exit(code);
+  const child = Bun.spawn(
+    ["wsl.exe", "-e", "env", ...fwd, "sh", "-c", 'exec "$HOME/.bun/bin/bun" run "$0" "$@"', script, ...process.argv.slice(2)],
+    { stdin: "inherit", stdout: "inherit", stderr: "inherit" },
+  );
+  process.exit(await child.exited);
 }
 
 export interface RunOptions {
   cwd?: string;
+  /** Added to this process's environment (not a replacement for it). */
   env?: Record<string, string>;
   /** Stream output to this terminal instead of capturing it. */
   inherit?: boolean;
@@ -122,38 +128,42 @@ export interface RunResult {
   out: string;
 }
 
-/** Runs a program with arguments (no shell parsing). A missing program is exit 127. */
+/** Runs a program with arguments (no shell parsing). A missing program is exit 127; a signal N is 128 + N. */
 export async function run(argv: string[], o: RunOptions = {}): Promise<RunResult> {
   // One stream, one order (zilc found two pipes interleave differently every run).
   if (!o.inherit && !isWindows) argv = ["sh", "-c", 'exec "$@" 2>&1', "sh", ...argv];
-  let child: Deno.ChildProcess;
-  try {
-    child = new Deno.Command(argv[0], {
-      args: argv.slice(1),
+  const spawn = () =>
+    Bun.spawn(argv, {
       cwd: o.cwd,
-      env: o.env,
-      stdin: "null",
-      stdout: o.inherit ? "inherit" : "piped",
-      stderr: o.inherit ? "inherit" : "piped",
-    }).spawn();
+      // Bun.spawn's `env` REPLACES the environment; the tools always meant "add to it".
+      env: o.env ? { ...process.env, ...o.env } : undefined,
+      stdin: "ignore",
+      stdout: o.inherit ? "inherit" : "pipe",
+      stderr: o.inherit ? "inherit" : "pipe",
+    });
+  let child: ReturnType<typeof spawn>;
+  try {
+    child = spawn();
   } catch (e) {
-    if (e instanceof Deno.errors.NotFound) return { code: 127, out: `${argv[0]}: not found\n` };
+    if ((e as NodeJS.ErrnoException).code === "ENOENT") return { code: 127, out: `${argv[0]}: not found\n` };
     throw e;
   }
   const chunks: Uint8Array[] = [];
-  const sink = async (s: ReadableStream<Uint8Array> | null) => {
-    if (!s) return;
-    for await (const c of s) chunks.push(c);
+  const sink = async (s: unknown) => {
+    if (!(s instanceof ReadableStream)) return;
+    for await (const c of s as ReadableStream<Uint8Array>) chunks.push(c);
   };
   if (!o.inherit) await Promise.all([sink(child.stdout), sink(child.stderr)]);
-  const status = await child.status;
+  const exit = await child.exited;
+  const sig = child.signalCode;
+  const code = sig ? 128 + (typeof sig === "number" ? sig : constants.signals[sig]) : exit;
   const all = new Uint8Array(chunks.reduce((n, c) => n + c.length, 0));
   let at = 0;
   for (const c of chunks) {
     all.set(c, at);
     at += c.length;
   }
-  return { code: status.code, out: o.inherit ? "" : new TextDecoder().decode(all) };
+  return { code, out: o.inherit ? "" : new TextDecoder().decode(all) };
 }
 
 /** Like `run`, but throws unless the program exits 0; returns its output. */
@@ -171,23 +181,15 @@ export async function show(argv: string[], o: RunOptions = {}): Promise<number> 
   return (await run(argv, { ...o, inherit: true })).code;
 }
 
-export function existsSync(p: string): boolean {
-  try {
-    Deno.statSync(p);
-    return true;
-  } catch {
-    return false;
-  }
-}
 export async function mkdirp(p: string): Promise<void> {
-  await Deno.mkdir(p, { recursive: true });
+  await mkdir(p, { recursive: true });
 }
 export async function rmrf(p: string): Promise<void> {
-  await Deno.remove(p, { recursive: true }).catch(() => {});
+  await rm(p, { recursive: true, force: true }).catch(() => {});
 }
-/** `BufferSource`, not `Uint8Array`: since TypeScript 5.7 a plain `Uint8Array` may sit on a
- *  SharedArrayBuffer, which `digest` refuses, and that failed `deno check` on every tool. */
-export async function sha256(bytes: BufferSource): Promise<string> {
+/** `Uint8Array<ArrayBuffer>`, not a bare `Uint8Array`: since TypeScript 5.7 a bare one may sit on a
+ *  SharedArrayBuffer, which `digest` refuses, and that failed the type-check of every tool. */
+export async function sha256(bytes: Uint8Array<ArrayBuffer>): Promise<string> {
   const d = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
   return [...d].map((b) => b.toString(16).padStart(2, "0")).join("");
 }

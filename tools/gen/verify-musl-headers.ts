@@ -6,7 +6,7 @@
 //   2. builds zailc-gen and writes the same tree into $WORK/gen/yolo-include;
 //   3. `diff -r` the two. Exit 0 only when they are identical.
 //
-//   deno run -A tools/gen/verify-musl-headers.ts        (from Windows or Linux; runs in WSL)
+//   bun run tools/gen/verify-musl-headers.ts       (from Windows or Linux; runs in WSL)
 
 import { REPO, WORK, linuxOnly, mkdirp, must, requireFilcSrc, rmrf, run, zig, zigCacheArgs } from "../lib/tool.ts";
 
@@ -41,4 +41,4 @@ if (d.code === 0) {
   console.log(d.out.split("\n").slice(0, 60).join("\n"));
   console.log("FAILED: trees differ");
 }
-Deno.exit(d.code === 0 ? 0 : 1);
+process.exit(d.code === 0 ? 0 : 1);

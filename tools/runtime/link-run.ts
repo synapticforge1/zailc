@@ -12,8 +12,10 @@
 //      by itself is reported as VARIES, not as a difference. Output (stdout and stderr, one
 //      stream) and exit code must be equal, and the exit code must be the expected one.
 //
-//   deno run -A tools/runtime/link-run.ts [name ...]     (from Windows or Linux; runs in WSL)
+//   bun run tools/runtime/link-run.ts [name ...]     (from Windows or Linux; runs in WSL)
 
+import { readdirSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 import { REPO, WORK, linuxOnly, mkdirp, must, run } from "../lib/tool.ts";
 import { linkTwo, normalise, prepareOverlay } from "./lib/two-runtimes.ts";
 
@@ -23,12 +25,12 @@ const base = `${WORK}/link`;
 const ov = await prepareOverlay(base);
 const TIMEOUT = "120";
 
-const only = Deno.args;
-const tests = [...Deno.readDirSync(`${REPO}/tests/link`)].map((e) => e.name).filter((n) => /\.(c|cpp)$/.test(n)).sort()
+const only = process.argv.slice(2);
+const tests = readdirSync(`${REPO}/tests/link`).filter((n) => /\.(c|cpp)$/.test(n)).sort()
   .filter((n) => only.length === 0 || only.includes(n.replace(/\.(c|cpp)$/, "")));
 if (only.length && tests.length !== only.length) {
   console.log(`FAILED: asked for ${only.join(", ")}, found ${tests.join(", ")}`);
-  Deno.exit(1);
+  process.exit(1);
 }
 
 // Each `// expect: exit N [with <flags>]` line is one variant of the program (default flags -O1).
@@ -38,7 +40,7 @@ if (only.length && tests.length !== only.length) {
 // both sides; the outputs are not compared. When upstream fixes it, the stock half fails.
 const variants: { file: string; name: string; flags: string[]; expect: number; departure?: { why: string; stockExit: number } }[] = [];
 for (const file of tests) {
-  const text = await Deno.readTextFile(`${REPO}/tests/link/${file}`);
+  const text = await readFile(`${REPO}/tests/link/${file}`, "utf8");
   const lines = [...text.matchAll(/^\/\/ expect: exit (\d+)(?: with (.+))?$/gm)];
   if (!lines.length) throw new Error(`${file}: no "// expect: exit N" line`);
   const dep = text.match(/^\/\/ departure (W-\d+): stock exit (\d+)$/m);
@@ -96,4 +98,4 @@ for (const { file, name, flags, expect, departure } of variants) {
 }
 
 console.log(`\n${tests.length} programs, ${variants.length} variants: ${pass} passed (${pass - passedDepartures} identical to stock, ${passedDepartures} recorded departures), ${fail} failed`);
-Deno.exit(fail === 0 && pass === variants.length && variants.length > 0 ? 0 : 1);
+process.exit(fail === 0 && pass === variants.length && variants.length > 0 ? 0 : 1);

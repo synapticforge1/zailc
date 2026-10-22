@@ -8,8 +8,10 @@
 // in KNOWN_UNDEF_DIFFS with its cmem/workarounds.md entry. A new difference fails, and so does a
 // listed one that has gone, so the list and the record cannot go stale.
 //
-//   deno run -A tools/runtime/verify-libpas.ts        (from Windows or Linux; runs in WSL)
+//   bun run tools/runtime/verify-libpas.ts        (from Windows or Linux; runs in WSL)
 
+import { readdirSync } from "node:fs";
+import { readdir, stat } from "node:fs/promises";
 import { REPO, WORK, existsSync, filcPrebuilt, linuxOnly, mkdirp, must, requireFilcSrc, rmrf, run, zig, zigCacheArgs } from "../lib/tool.ts";
 import { diff, sourcePaths, symbols } from "./lib/objects.ts";
 
@@ -23,7 +25,7 @@ const prefix = `${WORK}/out`;
 const r = await run([zig(), "build", "libpas", `-Dfilc-src=${src}`, `-Dpizfix=${prebuilt}/pizfix`, "--prefix", prefix, ...zigCacheArgs()], { cwd: REPO, inherit: true });
 if (r.code !== 0) {
   console.log("FAILED: zig build libpas");
-  Deno.exit(1);
+  process.exit(1);
 }
 
 // 2. Extract both archives.
@@ -55,13 +57,13 @@ let unknownUndef = 0;
 
 let objects = 0, same = 0, missingRef = 0, defMismatch = 0, undefMismatch = 0;
 const names: string[] = [];
-for await (const e of Deno.readDir(ours)) if (e.isFile && e.name.endsWith(".o")) names.push(e.name);
+for (const e of await readdir(ours, { withFileTypes: true })) if (e.isFile() && e.name.endsWith(".o")) names.push(e.name);
 names.sort();
 for (const name of names) {
   objects++;
   const ref = `${theirs}/pas-pizlo-release-${name}`;
   try {
-    await Deno.stat(ref);
+    await stat(ref);
   } catch {
     missingRef++;
     console.log(`NO REFERENCE  ${name}`);
@@ -121,7 +123,7 @@ const staleKnown = Object.keys(KNOWN_UNDEF_DIFFS).filter((n) => !seenKnown.has(n
 for (const n of staleKnown) console.log(`KNOWN DIFFERENCE GONE  ${n}: remove it from KNOWN_UNDEF_DIFFS and close its workarounds.md entry`);
 
 // Every upstream object needs one of ours, not only the other way round.
-const refNames = [...Deno.readDirSync(theirs)].map((e) => e.name).filter((n) => n.startsWith("pas-pizlo-release-"));
+const refNames = readdirSync(theirs).filter((n) => n.startsWith("pas-pizlo-release-"));
 const oursSet = new Set(names);
 const missingOurs = refNames.map((n) => n.slice("pas-pizlo-release-".length)).filter((n) => !oursSet.has(n)).sort();
 for (const n of missingOurs) console.log(`NOT BUILT  ${n} (upstream has pas-pizlo-release-${n})`);
@@ -153,4 +155,4 @@ for (const f of ["filc_crt.o", "filc_mincrt.o", "libyolounwind.a"]) {
 const ok = defMismatch === 0 && missingRef === 0 && missingOurs.length === 0 && unknownUndef === 0 &&
   staleKnown.length === 0 && pathForm === 0 && pathPresence === PATH_PRESENCE_BUDGET && smallOk;
 console.log(ok ? "OK: every object defines exactly the global symbols upstream's does and carries upstream's source paths" : "FAILED");
-Deno.exit(ok ? 0 : 1);
+process.exit(ok ? 0 : 1);

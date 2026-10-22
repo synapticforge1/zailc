@@ -4,16 +4,18 @@
 // `addSig` / `addOutSig` statement becomes one table row. The tables are DATA in that file, so they
 // are imported mechanically rather than typed by hand; when upstream changes them, re-run this.
 //
-//   deno run -A tools/gen/import-signatures.ts [path/to/generate_pizlonated_forwarders.rb]
+//   bun run tools/gen/import-signatures.ts [path/to/generate_pizlonated_forwarders.rb]
 //
 // Default input: the Fil-C source tree at FILC_SHA (tools/lib/tool.ts `filcSrc()`).
 
+import { readFile, writeFile } from "node:fs/promises";
 import { FILC_SHA, FILC_VERSION, REPO, filcSrc, linuxOnly, must, requireFilcSrc, zig, zigCacheArgs } from "../lib/tool.ts";
 
 await linuxOnly(import.meta);
 
-const rb = Deno.args[0] ?? `${await requireFilcSrc()}/libpas/src/libpas/generate_pizlonated_forwarders.rb`;
-const text = await Deno.readTextFile(rb);
+const input = process.argv[2];
+const rb = input ?? `${await requireFilcSrc()}/libpas/src/libpas/generate_pizlonated_forwarders.rb`;
+const text = await readFile(rb, "utf8");
 const lines = text.split("\n");
 
 // Upstream's licence header: the `#` comment block after the shebang, kept in the output.
@@ -95,8 +97,8 @@ const out = [
 ].join("\n");
 
 const dest = `${REPO}/src/gen/signatures.zig`;
-await Deno.writeTextFile(dest, out);
+await writeFile(dest, out);
 await must([zig(), "fmt", dest]);
 console.log(`${dest}: ${natives.length} native + ${users.length} user signatures from ${rb}`);
-if (Deno.args[0]) console.log(`note: input given explicitly; the default is ${filcSrc()} (${FILC_SHA})`);
+if (input) console.log(`note: input given explicitly; the default is ${filcSrc()} (${FILC_SHA})`);
 void zigCacheArgs;

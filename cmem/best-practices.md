@@ -18,10 +18,16 @@ Selected 2026-10-08 (owner: "copy in the ones that are relevant to our specific 
   machine. WSL interop is disabled (`/etc/wsl.conf`), so WSL cannot hand a process to Windows by
   accident. The why and the event-log evidence: zilc's `workarounds.md`, "Nothing built by Fil-C
   or cosmo is ever EXECUTED on the Windows host".
-- **Tools are Deno scripts** (owner: Deno or Bun, never Python; shell only inside `run()` argument
-  lists). Pass shell text to WSL as an argument list, never inline through PowerShell quoting: a
-  `grep -E "a|b"` sent inline became shell pipes, and a watcher looped on errors for an hour (zilc
-  KI-1, 2026-10-01). Throwaway scripts are Deno files in the session scratchpad.
+- **Tools are Bun scripts, and only Bun** (owner, 2026-10-22: "since deno is going away, please
+  make the scripts exclusively bun scripts"; before that, Deno or Bun). Never Deno or Python;
+  shell only inside `run()` argument lists. Tools use Bun's built-ins and `node:` modules, so
+  running one needs no install. Bun does not type-check, so `tools/dev/typecheck.ts` is the check
+  (a CI step). Pass shell text to WSL as an argument list, never inline through PowerShell
+  quoting: a `grep -E "a|b"` sent inline became shell pipes, and a watcher looped on errors for an
+  hour (zilc KI-1, 2026-10-01). Throwaway scripts are Bun files in the session scratchpad.
+- **`node_modules` never lives on the exFAT checkout.** Bun cannot rename its lockfile there from
+  Windows (EINVAL) or link a package's bin from WSL (EPERM: no symlinks) (zailc, 2026-10-22).
+  Install into a copy in `~/zailc-work`, as `tools/dev/typecheck.ts` does.
 - **LF everywhere** (`.gitattributes`: `* text=auto eol=lf`), and `core.autocrlf=false` in any
   reference clone. CRLF breaks `sh` and exact-text matching. **A setting the repo doesn't carry is a
   missing file**: a fix in machine config fixes one machine (binaryang, 32 files that only failed
@@ -31,8 +37,9 @@ Selected 2026-10-08 (owner: "copy in the ones that are relevant to our specific 
   from Zig's `\\` multiline-string prefix (zilc, 2026-09-18); binaryang lists four ways a shell
   layer corrupts literal text. **This includes edit SCRIPTS:** a Deno script piped in through a
   heredoc lost the backslashes of the regexes it inserted, three times in one day (zailc,
-  2026-10-09: `link-run.ts`, `two-runtimes.ts`, a cmem line). `deno check` or a read-back caught
-  each one; write the script with the editor and run it from the file.
+  2026-10-09: `link-run.ts`, `two-runtimes.ts`, a cmem line). `deno check` (since 2026-10-22,
+  `tools/dev/typecheck.ts`) or a read-back caught each one; write the script with the editor and
+  run it from the file.
 - **Caches and outputs live in `~/zailc-work`**, not on the exFAT repo (`workarounds.md` W-2).
 - **Stopping a WSL command from Windows does not stop its Linux processes**; check `ps` in WSL
   after a timeout, and give long jobs a long timeout up front.

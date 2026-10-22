@@ -1,12 +1,16 @@
 # tools/
 
 Developer tooling for zailc. Build logic stays in `build.zig`; everything else is here. **Every
-tool is a Deno script** (owner rule, from zilc: Deno or Bun, never Python or shell), run the same
-way from Windows and from Linux:
+tool is a Bun script** (owner rule: Bun only, never Deno, Python or shell; Deno was dropped on
+2026-10-22), run the same way from Windows and from Linux:
 
 ```
-deno run -A tools/<group>/<tool>.ts [args]
+bun run tools/<group>/<tool>.ts [args]
 ```
+
+The tools use Bun's built-ins and `node:` modules only, so running one needs no install. The
+type-check (`dev/typecheck.ts`) is the one exception: `package.json` and `bun.lock` pin TypeScript
+and `@types/bun` for it, and it installs them into a copy in `$WORK`, never into this checkout.
 
 Tools whose work needs Linux call `linuxOnly()` from `lib/tool.ts` first; on Windows that re-runs
 the tool inside WSL. **Nothing a tool builds is ever executed on the Windows host**
@@ -15,6 +19,7 @@ the tool inside WSL. **Nothing a tool builds is ever executed on the Windows hos
 | tool | what |
 | --- | --- |
 | `lib/tool.ts` | the shared helper: repo root, `$WORK` (`~/zailc-work`), Zig 0.15.2 and the Fil-C source tree lookups, `run`/`must`/`show`, `linuxOnly` |
+| `dev/typecheck.ts` | type-checks every tool (`tsc`, versions from `bun.lock`) on a copy in `$WORK/tools-check`; a CI step, and the same command locally |
 | `gen/import-signatures.ts` | derives `src/gen/signatures.zig` from upstream's `generate_pizlonated_forwarders.rb`; re-run on an upstream change |
 | `gen/verify-forwarders.ts` | runs Ruby and `zailc-gen` and compares the two outputs byte for byte |
 | `gen/verify-musl-headers.ts` | runs musl's `./configure && make install-headers` (the oracle) and `zailc-gen musl-headers`, then `diff -r` |

@@ -23,6 +23,8 @@
 // (the Fil-C-compiled libc and the five fil-pizlo objects) are scaffolding, replaced by roadmap
 // items.
 
+import { readdirSync } from "node:fs";
+import { copyFile, readFile } from "node:fs/promises";
 import { REPO, WORK, filcPrebuilt, mkdirp, must, requireFilcSrc, rmrf, run, sha256, zig, zigCacheArgs } from "../../lib/tool.ts";
 
 /** The crt objects zailc builds (yolo musl's, and filc_crt.o from libpas's step). */
@@ -51,7 +53,7 @@ export async function prepareOverlay(base: string): Promise<Overlay> {
     const b = await run([zig(), "build", step, `-Dfilc-src=${src}`, `-Dpizfix=${prebuilt}/pizfix`, "--prefix", out, ...zigCacheArgs()], { cwd: REPO, inherit: true });
     if (b.code !== 0) {
       console.log(`FAILED: zig build ${step}`);
-      Deno.exit(1);
+      process.exit(1);
     }
   }
 
@@ -60,24 +62,24 @@ export async function prepareOverlay(base: string): Promise<Overlay> {
   await mkdirp(parts);
   await mkdirp(overlay);
   await must(["ar", "x", `${out}/lib/libpizlo-stock.a`], { cwd: parts });
-  const ourObjects = new Set([...Deno.readDirSync(parts)].map((e) => e.name).filter((n) => n.endsWith(".o")));
+  const ourObjects = new Set(readdirSync(parts).filter((n) => n.endsWith(".o")));
   const filMembers = (await must(["ar", "t", `${pizfixLib}/libpizlo.a`])).split("\n").filter((m) => m.startsWith("fil-pizlo-"));
   if (ourObjects.size !== 178 || filMembers.length !== 5) {
     console.log(`FAILED: expected 178 of our objects and 5 fil-pizlo members, got ${ourObjects.size} and ${filMembers.length}`);
-    Deno.exit(1);
+    process.exit(1);
   }
   await must(["ar", "x", `${pizfixLib}/libpizlo.a`, ...filMembers], { cwd: parts });
-  const members = [...Deno.readDirSync(parts)].map((e) => e.name).filter((n) => n.endsWith(".o")).sort();
+  const members = readdirSync(parts).filter((n) => n.endsWith(".o")).sort();
   await must(["ar", "rcs", `${overlay}/libpizlo.a`, ...members], { cwd: parts });
 
   // Our archives, copied; names cannot always tell ours from upstream's (yolounwind.o in both;
   // libyolom.a is empty in both, so for it only "the bytes are our build's" is checked): bytes can.
   for (const a of OUR_ARCHIVES) {
-    await Deno.copyFile(`${out}/lib/${a}`, `${overlay}/${a}`);
-    const [ov, mine, up] = await Promise.all([`${overlay}/${a}`, `${out}/lib/${a}`, `${pizfixLib}/${a}`].map(async (p) => sha256(await Deno.readFile(p))));
+    await copyFile(`${out}/lib/${a}`, `${overlay}/${a}`);
+    const [ov, mine, up] = await Promise.all([`${overlay}/${a}`, `${out}/lib/${a}`, `${pizfixLib}/${a}`].map(async (p) => sha256(await readFile(p))));
     if (ov !== mine || (ov === up && a !== "libyolom.a")) {
       console.log(`FAILED: the overlay's ${a} is not ours (overlay ${ov.slice(0, 12)}, ours ${mine.slice(0, 12)}, upstream ${up.slice(0, 12)})`);
-      Deno.exit(1);
+      process.exit(1);
     }
   }
   const ourCrt = new Map(OUR_CRT.map((f) => [f, `${out}/lib/${f}`]));
@@ -135,8 +137,8 @@ export async function linkTwo(ov: Overlay, driver: string, objects: string[], di
   }
   // The map names every archive member pulled in as `<archive>(<member>)` and every input object
   // by path. (GNU ld 2.46's --trace lists archives only, not members, so it cannot show this.)
-  const sm = await Deno.readTextFile(`${dir}/stock.map`);
-  const om = await Deno.readTextFile(`${dir}/ours.map`);
+  const sm = await readFile(`${dir}/stock.map`, "utf8");
+  const om = await readFile(`${dir}/ours.map`, "utf8");
   const upstreamPieces = [
     ...["libpizlo", ...OUR_ARCHIVES.map((a) => a.replace(/\.a$/, ""))].map((l) => `/pizfix/lib/${l}.a(`),
     ...OUR_CRT.map((f) => `/pizfix/lib/${f}`), // every crt object zailc builds, swapped or not
