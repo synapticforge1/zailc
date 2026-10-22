@@ -27,7 +27,8 @@ gate is the owner's decision**, made as its own commit (`closed` → `open`) on 
 with `--no-ff`. Once it is open, everything below applies unchanged.
 
 **Current state (2026-10-08, night):** version `0.1.0` in `build.zig.zon`; nothing released, no
-tag. **The release gate is `closed`.** `main` is pushed to `github.com/jrmarcum/zailc`; the first
+tag. **The release gate is `closed`.** `main` is pushed to `github.com/jrmarcum/zailc` (since moved:
+`github.com/synapticforge1/zailc`, `design-decisions.md` 2026-10-22); the first
 push with the workflows (`8a73338..a75acda`) ran both on GitHub: CI success (format, tests,
 smoke); "Auto-tag on version bump" success, with "Read the release gate" run and "Read version"
 and "Create and push the tag" SKIPPED, and its Publish job skipped; the repo has no tag and no

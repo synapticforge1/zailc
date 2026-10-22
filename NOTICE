@@ -36,7 +36,7 @@ original license, and every such use is recorded in:
           MIT, Copyright (c) Zig contributors
                                             third_party/zig/LICENSE
 
-  * zilc — https://github.com/jrmarcum/zilc (same author; the reference and
+  * zilc — https://github.com/synapticforge1/zilc (same author; the reference and
     test oracle for zailc). Apache-2.0 WITH LLVM-exception OR MIT.
 
 Where a component is distributed under the Apache License, Version 2.0, this
