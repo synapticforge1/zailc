@@ -4,14 +4,15 @@
 // files next to them, so build.zig compiles exactly the files upstream's Makefile compiles.
 // Re-run when the pin moves (tools/lib/tool.ts FILC_SHA).
 //
-//   deno run -A tools/runtime/import-libpas-sources.ts
+//   bun run tools/runtime/import-libpas-sources.ts
 
+import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { FILC_SHA, FILC_VERSION, REPO, linuxOnly, must, requireFilcSrc, zig } from "../lib/tool.ts";
 
 await linuxOnly(import.meta);
 
 const src = await requireFilcSrc();
-const mk = await Deno.readTextFile(`${src}/libpas/common.mk`);
+const mk = await readFile(`${src}/libpas/common.mk`, "utf8");
 
 // PASSRCS = \ <tab>src/libpas/a.c \ ... <tab>src/libpas/z.c
 const m = mk.match(/^PASSRCS = \\\n((?:.*\\\n)*.*)$/m);
@@ -22,7 +23,7 @@ const c = all.filter((f) => !f.endsWith("filc_native_forwarders.c"));
 
 // PASASMSRCS = $(sort $(wildcard src/libpas/*.S))
 const asm: string[] = [];
-for await (const e of Deno.readDir(`${src}/libpas/src/libpas`)) if (e.isFile && e.name.endsWith(".S")) asm.push(`src/libpas/${e.name}`);
+for (const e of await readdir(`${src}/libpas/src/libpas`, { withFileTypes: true })) if (e.isFile() && e.name.endsWith(".S")) asm.push(`src/libpas/${e.name}`);
 asm.sort();
 
 const z = (s: string) => JSON.stringify(s);
@@ -40,7 +41,7 @@ const out = [
 ].join("\n");
 
 const dest = `${REPO}/src/runtime/libpas_sources.zig`;
-await Deno.mkdir(`${REPO}/src/runtime`, { recursive: true });
-await Deno.writeTextFile(dest, out);
+await mkdir(`${REPO}/src/runtime`, { recursive: true });
+await writeFile(dest, out);
 await must([zig(), "fmt", dest]);
 console.log(`${dest}: ${c.length} C files + ${generated.length} generated + ${asm.length} assembly, from ${src}/libpas/common.mk`);

@@ -13,8 +13,9 @@
 //   crt1.o Scrt1.o rcrt1.o crti.o crtn.o   the same checks.
 //   libyolom.a   both empty archives.
 //
-//   deno run -A tools/runtime/verify-yolomusl.ts      (from Windows or Linux; runs in WSL)
+//   bun run tools/runtime/verify-yolomusl.ts      (from Windows or Linux; runs in WSL)
 
+import { readFileSync } from "node:fs";
 import { REPO, WORK, existsSync, filcPrebuilt, linuxOnly, requireFilcSrc, run, zig, zigCacheArgs } from "../lib/tool.ts";
 import { Oracle } from "./lib/objects.ts";
 
@@ -43,7 +44,7 @@ const EMPTY_TU_BUDGET = 1;
 const b = await run([zig(), "build", "yolomusl", `-Dfilc-src=${src}`, "--prefix", prefix, ...zigCacheArgs()], { cwd: REPO, inherit: true });
 if (b.code !== 0) {
   console.log("FAILED: zig build yolomusl");
-  Deno.exit(1);
+  process.exit(1);
 }
 
 const compared = await oracle.archives("libyoloc.a", `${prefix}/lib/libyoloc.a`, `${theirLib}/libyoloc.a`);
@@ -55,11 +56,11 @@ for (const f of ["crt1.o", "Scrt1.o", "rcrt1.o", "crti.o", "crtn.o"]) {
   const d = await oracle.pair(f, `${prefix}/lib/${f}`, `${theirLib}/${f}`);
   console.log(`${f}: compared${d ? " (compiler-only undefined differences)" : ""}`);
 }
-const yolom = [`${prefix}/lib/libyolom.a`, `${theirLib}/libyolom.a`].map((p) => new TextDecoder().decode(Deno.readFileSync(p)));
+const yolom = [`${prefix}/lib/libyolom.a`, `${theirLib}/libyolom.a`].map((p) => new TextDecoder().decode(readFileSync(p)));
 if (yolom[0] !== "!<arch>\n" || yolom[1] !== "!<arch>\n") oracle.fail(`libyolom.a: not both empty archives`);
 else console.log("libyolom.a: both empty archives");
 
 oracle.ratchet("EMPTY-TU", oracle.emptyTu, EMPTY_TU_BUDGET);
 console.log(`compile unit names: ${oracle.cuCompared} equal to upstream's; ${oracle.emptyTu} empty translation unit(s) where only GCC emits one (budget ${EMPTY_TU_BUDGET})`);
 console.log(oracle.failures ? `FAILED: ${oracle.failures}` : "OK: libyoloc.a and the crt objects define exactly upstream's symbols, in upstream's member order, with upstream's compile unit names");
-Deno.exit(oracle.failures ? 1 : 0);
+process.exit(oracle.failures ? 1 : 0);

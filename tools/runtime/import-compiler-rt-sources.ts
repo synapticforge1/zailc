@@ -12,8 +12,9 @@
 // language, the flags, and the two crt objects' command lines. The Fil-C tree is never written.
 // Re-run when the pin moves.
 //
-//   deno run -A tools/runtime/import-compiler-rt-sources.ts
+//   bun run tools/runtime/import-compiler-rt-sources.ts
 
+import { chmod, readFile, writeFile } from "node:fs/promises";
 import { FILC_SHA, FILC_VERSION, REPO, WORK, linuxOnly, mkdirp, must, requireFilcSrc, rmrf, zig } from "../lib/tool.ts";
 
 await linuxOnly(import.meta);
@@ -24,7 +25,7 @@ const crtDir = `${filc}/compiler-rt`;
 const builtinsDir = `${crtDir}/lib/builtins`;
 
 // The options must still be upstream's: fail loudly if build_compiler_rt.sh changed them.
-const script = await Deno.readTextFile(`${filc}/build_compiler_rt.sh`);
+const script = await readFile(`${filc}/build_compiler_rt.sh`, "utf8");
 const OPTIONS = [
   "-DCMAKE_BUILD_TYPE=Release",
   "-DCOMPILER_RT_BUILD_BUILTINS=ON",
@@ -44,8 +45,8 @@ const scratch = `${WORK}/gen/compiler-rt-cmake`;
 await rmrf(scratch);
 await mkdirp(`${scratch}/bin`);
 const wrap = async (name: string, body: string) => {
-  await Deno.writeTextFile(`${scratch}/bin/${name}`, `#!/bin/sh\nexec ${body} "$@"\n`);
-  await Deno.chmod(`${scratch}/bin/${name}`, 0o755);
+  await writeFile(`${scratch}/bin/${name}`, `#!/bin/sh\nexec ${body} "$@"\n`);
+  await chmod(`${scratch}/bin/${name}`, 0o755);
 };
 await wrap("zigcc", `${zig()} cc -target ${ARCH}-linux-gnu`);
 await wrap("zigc++", `${zig()} c++ -target ${ARCH}-linux-gnu`);
@@ -57,7 +58,7 @@ await must([
   `-DCMAKE_C_COMPILER=${scratch}/bin/zigcc`, `-DCMAKE_CXX_COMPILER=${scratch}/bin/zigc++`,
   `-DCMAKE_ASM_COMPILER=${scratch}/bin/zigcc`, `-DCMAKE_AR=${scratch}/bin/zigar`, `-DCMAKE_RANLIB=${scratch}/bin/zigranlib`,
 ]);
-const ninja = await Deno.readTextFile(`${scratch}/build/build.ninja`);
+const ninja = await readFile(`${scratch}/build/build.ninja`, "utf8");
 const blocks = ninja.split("\n\n");
 
 // ---- the builtins archive: members in the archive's order, then each member's compile rule
@@ -123,6 +124,6 @@ const out = [
 ].join("\n");
 
 const dest = `${REPO}/src/runtime/compiler_rt_sources.zig`;
-await Deno.writeTextFile(dest, out);
+await writeFile(dest, out);
 await must([zig(), "fmt", dest]);
 console.log(`${dest}: ${members.length} builtins (${members.filter((m) => m.lang === "asm").length} assembly), crtbegin ${crtbegin.path}, crtend ${crtend.path}`);

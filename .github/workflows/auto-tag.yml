@@ -42,16 +42,16 @@ jobs:
         with:
           fetch-depth: 0 # full history and tags, so the tag lookup sees every tag
 
-      - name: Install Deno
-        uses: denoland/setup-deno@v2
+      - name: Install Bun 1.4.3
+        uses: oven-sh/setup-bun@v2
         with:
-          deno-version: v2.x
+          bun-version: 1.4.3
 
       # A malformed gate file fails the run (gate.ts exits 1); it never reads as open.
       - name: Read the release gate
         id: gate
         run: |
-          STATE="$(deno run --allow-read tools/release/gate.ts)"
+          STATE="$(bun run tools/release/gate.ts)"
           echo "state=$STATE" >> "$GITHUB_OUTPUT"
           if [ "$STATE" = closed ]; then
             echo "::notice::Release gate is closed (.github/release-gate): main is up to date, nothing is released."

@@ -6,8 +6,9 @@
 //   2. builds zailc-gen with Zig 0.15.2 and writes both files into $WORK/gen/;
 //   3. compares. Exit 0 only when both files are identical.
 //
-//   deno run -A tools/gen/verify-forwarders.ts        (from Windows or Linux; runs in WSL)
+//   bun run tools/gen/verify-forwarders.ts        (from Windows or Linux; runs in WSL)
 
+import { copyFile, readFile } from "node:fs/promises";
 import { REPO, WORK, linuxOnly, mkdirp, must, requireFilcSrc, run, sha256, zig, zigCacheArgs } from "../lib/tool.ts";
 
 await linuxOnly(import.meta);
@@ -19,7 +20,7 @@ const files = ["filc_native.h", "filc_native_forwarders.c"];
 // 1. Ruby's output.
 const ref = `${WORK}/ref/forwarders`;
 await mkdirp(`${ref}/src/libpas`);
-await Deno.copyFile(rb, `${ref}/src/libpas/generate_pizlonated_forwarders.rb`);
+await copyFile(rb, `${ref}/src/libpas/generate_pizlonated_forwarders.rb`);
 for (const f of files) await must(["ruby", "src/libpas/generate_pizlonated_forwarders.rb", `src/libpas/${f}`], { cwd: ref });
 
 // 2. Zig's output.
@@ -33,8 +34,8 @@ await must([`${prefix}/bin/zailc-gen`, "forwarders", `${gen}/filc_native_forward
 // 3. Compare.
 let ok = true;
 for (const f of files) {
-  const a = await Deno.readFile(`${ref}/src/libpas/${f}`);
-  const b = await Deno.readFile(`${gen}/${f}`);
+  const a = await readFile(`${ref}/src/libpas/${f}`);
+  const b = await readFile(`${gen}/${f}`);
   const same = a.length === b.length && a.every((x, i) => x === b[i]);
   console.log(`${same ? "SAME" : "DIFF"}  ${f}  ruby ${a.length} B  zig ${b.length} B  sha256(zig) ${await sha256(b)}`);
   if (!same) {
@@ -44,4 +45,4 @@ for (const f of files) {
   }
 }
 console.log(ok ? `OK: zailc-gen's output is byte-identical to Ruby's (Fil-C tree ${src})` : "FAILED: outputs differ");
-Deno.exit(ok ? 0 : 1);
+process.exit(ok ? 0 : 1);

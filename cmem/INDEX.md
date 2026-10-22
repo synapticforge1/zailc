@@ -10,7 +10,8 @@ small. Modeled on zilc's `cmem/` (same author), which is modeled on wazmrt's.
 - Every workaround gets an entry in `workarounds.md` WHEN IT IS MADE, with copious notes on the why.
 - Nothing produced by Fil-C, cosmo, zilc or zailc is ever EXECUTED on the Windows host; all building
   and running happens inside WSL (`best-practices.md`).
-- LF line endings everywhere (`.gitattributes`); tools in Deno; no Python, no shell scripts.
+- LF line endings everywhere (`.gitattributes`); tools in Bun only (owner, 2026-10-22: Deno is
+  going away); no Deno, no Python, no shell scripts.
 - zilc is the oracle: zailc is right when it produces what zilc (and, through it, upstream Fil-C)
   produces (`oracle.md`).
 
@@ -18,6 +19,13 @@ small. Modeled on zilc's `cmem/` (same author), which is modeled on wazmrt's.
 
 ## ⏸️ PAUSED 2026-10-09 (night), owner: "update the project memory files and pause here for today". RESUME HERE
 
+- ✅ **2026-10-22: the tools are Bun scripts, Deno is gone** (owner: "since deno is going away,
+  please make the scripts exclusively bun scripts"). All 16 tools were ported to Bun's built-ins
+  and `node:` modules. `deno check` is replaced by `tools/dev/typecheck.ts` (`tsc` pinned in
+  `tools/bun.lock`, run on a copy in `$WORK`, because node_modules cannot live on exFAT); CI runs
+  the same tool. Proven: the four importers regenerate their files byte-identically, and every
+  gate passes under Bun (`testing.md`). Rule: `best-practices.md` § 1; decision:
+  `design-decisions.md`.
 - **Where things stand.** Step 2's stock-compiled runtime is done, and every piece is proven
   against upstream's release, by symbols member by member (in order) and by behaviour:
   - the forwarder generator and musl's header install (byte-identical);
@@ -126,7 +134,7 @@ small. Modeled on zilc's `cmem/` (same author), which is modeled on wazmrt's.
 | --- | --- |
 | [scope.md](scope.md) | **The brief** (from zilc's `zig-filc-scope.md`, 2026-10-05): the three steps sized, step 2's piece table, step 3's shape, costs and risks |
 | [vision.md](vision.md) | What zailc is for, in the owner's words, and how it differs from zilc |
-| [design-decisions.md](design-decisions.md) | The decisions table: the name `zailc`, Zig 0.15.2 pinned, zilc as oracle, byte-identical generated files, the WSL-only rule, licence, Deno tools, the imported signature table, a push to `main` releases, the Fil-C tree as a read-only input, compile settings in Zig's terms, the symbol-level oracle for objects; plus the open questions |
+| [design-decisions.md](design-decisions.md) | The decisions table: the name `zailc`, Zig 0.15.2 pinned, zilc as oracle, byte-identical generated files, the WSL-only rule, licence, Bun tools (Deno dropped 2026-10-22), the imported signature table, a push to `main` releases, the Fil-C tree as a read-only input, compile settings in Zig's terms, the symbol-level oracle for objects; plus the open questions |
 | [roadmap.md](roadmap.md) | Step 2 and step 3 broken into checkable items; what the cosmo evaluation and platform scope leave for zailc |
 | [oracle.md](oracle.md) | How zilc and Fil-C serve as the oracle: trees, versions, hashes, the comparison procedure |
 | [upstream.md](upstream.md) | Pinned Fil-C (v0.686, `163fae5`) and Zig (0.15.2); where they live on the development machine |

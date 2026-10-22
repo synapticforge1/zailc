@@ -18,8 +18,10 @@
 // runs configure (CC = `zig cc -target x86_64-linux-none`) in a SCRATCH COPY of the tree and reads
 // its config.mak. The Fil-C tree is never written. Re-run when the pin moves.
 //
-//   deno run -A tools/runtime/import-yolomusl-sources.ts
+//   bun run tools/runtime/import-yolomusl-sources.ts
 
+import { readdirSync } from "node:fs";
+import { chmod, readFile, stat, writeFile } from "node:fs/promises";
 import { FILC_SHA, FILC_VERSION, REPO, WORK, linuxOnly, must, requireFilcSrc, rmrf, zig } from "../lib/tool.ts";
 
 await linuxOnly(import.meta);
@@ -27,7 +29,7 @@ await linuxOnly(import.meta);
 const ARCH = "x86_64";
 const filc = await requireFilcSrc();
 const tree = `${filc}/projects/yolomusl`;
-const mk = await Deno.readTextFile(`${tree}/Makefile`);
+const mk = await readFile(`${tree}/Makefile`, "utf8");
 
 // The rules this tool evaluates must still be the Makefile's: fail loudly if upstream changed them.
 for (const rule of [
@@ -46,20 +48,20 @@ for (const rule of [
   if (!mk.includes(rule)) throw new Error(`yolomusl's Makefile no longer contains: ${rule}`);
 }
 try {
-  await Deno.stat(`${tree}/arch/${ARCH}/arch.mak`);
+  await stat(`${tree}/arch/${ARCH}/arch.mak`);
   throw new Error(`arch/${ARCH}/arch.mak exists now; COMPAT_SRC_DIRS may be set: extend this tool`);
 } catch (e) {
-  if (!(e instanceof Deno.errors.NotFound)) throw e;
+  if ((e as NodeJS.ErrnoException).code !== "ENOENT") throw e;
 }
 
 // ---- configure, with Zig's clang, in a scratch copy
 const scratch = `${WORK}/gen/yolomusl-configure`;
 await rmrf(scratch);
 await must(["cp", "-r", tree, scratch]);
-await Deno.writeTextFile(`${scratch}/zigcc`, `#!/bin/sh\nexec ${zig()} cc -target ${ARCH}-linux-none "$@"\n`);
-await Deno.chmod(`${scratch}/zigcc`, 0o755);
+await writeFile(`${scratch}/zigcc`, `#!/bin/sh\nexec ${zig()} cc -target ${ARCH}-linux-none "$@"\n`);
+await chmod(`${scratch}/zigcc`, 0o755);
 await must(["./configure", `--prefix=${scratch}/out`, `CC=${scratch}/zigcc`], { cwd: scratch });
-const config = await Deno.readTextFile(`${scratch}/config.mak`);
+const config = await readFile(`${scratch}/config.mak`, "utf8");
 const cfg = (name: string): string[] => {
   const m = config.match(new RegExp(`^${name} = (.*)$`, "m"));
   if (!m) throw new Error(`config.mak has no ${name}`);
@@ -74,14 +76,14 @@ if (cfg("ADD_CFI")[0] !== "no") throw new Error("ADD_CFI is not `no`: the assemb
 // ---- the Makefile's object rules
 const listDir = (d: string, ok: (name: string) => boolean): string[] => {
   try {
-    return [...Deno.readDirSync(`${tree}/${d}`)].filter((e) => e.isFile && ok(e.name)).map((e) => `${d}/${e.name}`);
+    return readdirSync(`${tree}/${d}`, { withFileTypes: true }).filter((e) => e.isFile() && ok(e.name)).map((e) => `${d}/${e.name}`);
   } catch (e) {
-    if (e instanceof Deno.errors.NotFound) return [];
+    if ((e as NodeJS.ErrnoException).code === "ENOENT") return [];
     throw e;
   }
 };
 const srcDirs = [
-  ...[...Deno.readDirSync(`${tree}/src`)].filter((e) => e.isDirectory).map((e) => `src/${e.name}`).sort(),
+  ...readdirSync(`${tree}/src`, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => `src/${e.name}`).sort(),
   `src/malloc/${mallocDir}`, "crt", "ldso",
 ];
 const byteSort = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0); // GNU make's $(sort): bytes
@@ -109,7 +111,7 @@ const crt: Row[] = crtObjs.map((o) => ({
   path: srcOf.get(o)!, o3: false, memops: false, nossp: true, pic: ["crt/Scrt1.o", "crt/rcrt1.o"].includes(o.replace(`/${ARCH}/`, "/")),
 }));
 const ldso: Row[] = ldsoObjs.map((o) => ({ path: srcOf.get(o)!, o3: false, memops: false, nossp: true, pic: true }));
-const version = (await Deno.readTextFile(`${tree}/VERSION`)).trim();
+const version = (await readFile(`${tree}/VERSION`, "utf8")).trim();
 
 // ---- emit
 const z = (s: string) => JSON.stringify(s);
@@ -159,7 +161,7 @@ const out = [
 ].join("\n");
 
 const dest = `${REPO}/src/runtime/yolomusl_sources.zig`;
-await Deno.writeTextFile(dest, out);
+await writeFile(dest, out);
 await must([zig(), "fmt", dest]);
 const n = (rs: Row[], k: keyof Row) => rs.filter((r) => r[k]).length;
 console.log(`${dest}: libc ${libc.length} (${n(libc, "o3")} -O3, ${n(libc, "nossp")} nossp, ${n(libc, "memops")} memops; ` +

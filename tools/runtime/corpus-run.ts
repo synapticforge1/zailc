@@ -25,21 +25,23 @@
 // exit) / LINES-DIFFER. Exit 0 only when every program is SAME, VARIES-SAME-SHAPE or
 // SAME-LINES-ANY-ORDER.
 //
-//   deno run -A tools/runtime/corpus-run.ts ["c zig"] [name ...]     (runs in WSL)
+//   bun run tools/runtime/corpus-run.ts ["c zig"] [name ...]     (runs in WSL)
 //   env: MODE (default ReleaseSafe), JOBS (default 8), TBUILD (s, default 1800),
 //        ZAILC_ZILC (zilc's repo; default ../zilc), ZAILC_ZILC_FILC (the clang zilc uses)
 
+import { readdirSync } from "node:fs";
+import { chmod, copyFile, realpath, writeFile } from "node:fs/promises";
 import { HOME, REPO, WORK, env, existsSync, linuxOnly, mkdirp, must, rmrf, run, zig, zigCacheArgs } from "../lib/tool.ts";
 import { linkTwo, normalise, prepareOverlay } from "./lib/two-runtimes.ts";
 
 await linuxOnly(import.meta);
 
 const mode = env("MODE", "ReleaseSafe");
-const langs = (Deno.args[0] ?? "c zig").split(/\s+/).filter(Boolean);
-const only = Deno.args.slice(1);
+const langs = (process.argv[2] ?? "c zig").split(/\s+/).filter(Boolean);
+const only = process.argv.slice(3);
 const jobs = Number(env("JOBS", "8"));
 const tbuild = env("TBUILD", "1800");
-const zilcRepo = await Deno.realPath(env("ZAILC_ZILC", `${REPO}/../zilc`));
+const zilcRepo = await realpath(env("ZAILC_ZILC", `${REPO}/../zilc`));
 const base = `${WORK}/corpus-${mode}`;
 
 const ov = await prepareOverlay(`${base}/runtime`);
@@ -61,9 +63,9 @@ interface Work { lang: string; name: string; file: string }
 const work: Work[] = [];
 for (const lang of langs) {
   const dir = `${base}/src/${lang === "zig" ? "zig-0.15.2" : lang}`;
-  for (const d of [...Deno.readDirSync(dir)].filter((e) => e.isDirectory).map((e) => e.name).sort()) {
+  for (const d of readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort()) {
     if (only.length && !only.includes(d)) continue;
-    for (const f of [...Deno.readDirSync(`${dir}/${d}`)].map((e) => e.name).filter((n) => n.endsWith(`.${lang}`)).sort()) {
+    for (const f of readdirSync(`${dir}/${d}`).filter((n) => n.endsWith(`.${lang}`)).sort()) {
       work.push({ lang, name: d, file: `${dir}/${d}/${f}` });
     }
   }
@@ -74,10 +76,10 @@ async function exec(b: string, bin: string): Promise<{ code: number; out: string
   const r = `${b}/run`;
   await rmrf(r);
   await mkdirp(`${r}/cwd/tmp`);
-  await Deno.writeTextFile(`${r}/cwd/tmp/dat.txt`, "hello\nzig\n");
-  await Deno.writeTextFile(`${r}/stdin.txt`, "hello\nfilter\n");
-  await Deno.copyFile(bin, `${r}/prog`);
-  await Deno.chmod(`${r}/prog`, 0o755);
+  await writeFile(`${r}/cwd/tmp/dat.txt`, "hello\nzig\n");
+  await writeFile(`${r}/stdin.txt`, "hello\nfilter\n");
+  await copyFile(bin, `${r}/prog`);
+  await chmod(`${r}/prog`, 0o755);
   const res = await run([
     "env", "-i", `HOME=${HOME}`, `PATH=${env("PATH")}`, `USER=${env("USER")}`, "LANG=C.UTF-8", "TERM=dumb",
     "sh", "-c", 'exec timeout -s KILL 15 "$0" < "$1"', `${r}/prog`, `${r}/stdin.txt`,
@@ -111,7 +113,7 @@ async function one(w: Work): Promise<string> {
   const b = `${base}/bin/${w.lang}/${w.name}`;
   await mkdirp(b);
   const built = await run(["timeout", tbuild, zilc, "build", "-O", mode, "--keep-temps", "-v", "-o", `${b}/prog`, w.file], { env: buildEnv, cwd: b });
-  await Deno.writeTextFile(`${b}/build.log`, built.out);
+  await writeFile(`${b}/build.log`, built.out);
   if (built.code !== 0) return `${id} BUILD-FAIL ${built.out.match(/undefined reference to `[^']*'/)?.[0] ?? `exit ${built.code}`}`;
 
   // zilc's final link, from its verbose output: `+ <clang> -O1 -g <inputs> -o <b>/prog`.
@@ -137,8 +139,8 @@ async function one(w: Work): Promise<string> {
   const s1 = await exec(b, linked.stock);
   const s2 = await exec(b, linked.stock);
   const o = await exec(b, linked.ours);
-  await Deno.writeTextFile(`${b}/stock.out`, s1.out);
-  await Deno.writeTextFile(`${b}/ours.out`, o.out);
+  await writeFile(`${b}/stock.out`, s1.out);
+  await writeFile(`${b}/ours.out`, o.out);
   const how = `exit ${o.code}, ${objects.length} object(s), ${linked.members} libpizlo + ${linked.yolocMembers} libyoloc members`;
   if (Object.hasOwn(THREAD_ORDER, w.name)) {
     const ok = o.code === s1.code && s1.code === s2.code && anyOrder(o.out) === anyOrder(s1.out);
@@ -171,7 +173,7 @@ await Promise.all(Array.from({ length: Math.min(jobs, work.length) }, async () =
   }
 }));
 results.sort();
-await Deno.writeTextFile(`${base}/results.txt`, results.join("\n") + "\n");
+await writeFile(`${base}/results.txt`, results.join("\n") + "\n");
 
 let bad = 0;
 for (const lang of langs) {
@@ -182,4 +184,4 @@ for (const lang of langs) {
   console.log(`== ${lang} [${mode}]: ${mine.length} programs: ${count("SAME")} SAME, ${count("VARIES-SAME-SHAPE")} VARIES-SAME-SHAPE, ${count("SAME-LINES-ANY-ORDER")} SAME-LINES-ANY-ORDER, ${count("LINES-DIFFER")} LINES-DIFFER, ${count("DIFFERS")} DIFFERS, ${count("SHAPE-DIFFERS")} SHAPE-DIFFERS, ${count("BUILD-FAIL")} BUILD-FAIL, ${count("LINK-FAIL")} LINK-FAIL`);
 }
 console.log(`results: ${base}/results.txt`);
-Deno.exit(bad === 0 && results.length > 0 ? 0 : 1);
+process.exit(bad === 0 && results.length > 0 ? 0 : 1);

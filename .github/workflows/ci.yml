@@ -33,15 +33,16 @@ jobs:
       - name: Format check
         run: zig fmt --check build.zig build.zig.zon src
 
-      # The tools are Deno, and `deno run` does not type-check: a type error in tools/lib/tool.ts
-      # went unseen across every tool until 2026-10-08. This step is the only place they are checked.
-      - name: Install Deno
-        uses: denoland/setup-deno@v2
+      # The tools are Bun, and Bun does not type-check: a type error in tools/lib/tool.ts went
+      # unseen across every tool until 2026-10-08. This step is the only place they are checked.
+      # Bun is pinned to the version tools/bun.lock's @types/bun describes.
+      - name: Install Bun 1.4.3
+        uses: oven-sh/setup-bun@v2
         with:
-          deno-version: v2.x
+          bun-version: 1.4.3
 
       - name: Type-check the tools
-        run: deno check tools/
+        run: bun run tools/dev/typecheck.ts
 
       - name: Unit and byte-identity tests
         run: zig build test --summary all
