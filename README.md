@@ -5,7 +5,7 @@ with AI-assisted development. Zig's tool chain and language syntax backbone, wit
 fixes and security hardening. Open book editing of the upstream tools so the upstream projects
 can see what was fixed and the reasons why.
 
-> **Status: day one (2026-10-08).** zailc grows out of [zilc](https://github.com/jrmarcum/zilc),
+> **Status: day one (2026-10-08).** zailc grows out of [zilc](https://github.com/synapticforge1/zilc),
 > which compiles Zig and C through Fil-C's pass and runtime and stays the stable, upstream-faithful
 > reference and zailc's test oracle. zailc's end state is a toolchain whose user installs ONLY Zig
 > and runs `zig build`. It stays on **Zig 0.15.2** (LLVM 20, the LLVM Fil-C 0.686 uses) until it

@@ -19,6 +19,10 @@ small. Modeled on zilc's `cmem/` (same author), which is modeled on wazmrt's.
 
 ## ⏸️ PAUSED 2026-10-09 (night), owner: "update the project memory files and pause here for today". RESUME HERE
 
+- 🏠 **2026-10-22: the repository moved to `github.com/synapticforge1/zailc`** (zilc too:
+  `synapticforge1/zilc`). The old `jrmarcum/` URLs redirect; `origin` uses the new one
+  (`design-decisions.md`). The push of `228bcd6` ran green there: CI (with Bun and the tools'
+  type-check) and auto-tag (gate `closed`, tag steps skipped); no tag, no release (`testing.md`).
 - ✅ **2026-10-22: the tools are Bun scripts, Deno is gone** (owner: "since deno is going away,
   please make the scripts exclusively bun scripts"). All 16 tools were ported to Bun's built-ins
   and `node:` modules. `deno check` is replaced by `tools/dev/typecheck.ts` (`tsc` pinned in
