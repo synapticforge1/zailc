@@ -52,11 +52,11 @@ zailc is under the workspace floor (`../cmem/working-rules.md`, `memory-conventi
 | --- | --- |
 | [open-work.md](open-work.md) | **Status (the one place), the resume item, what is open, done work summarized with merge commits, letters answered** |
 | [scope.md](scope.md) | **The brief** (from zilc's `zig-filc-scope.md`, 2026-10-05): the three steps sized, step 2's piece table, step 3's shape, costs and risks |
-| [vision.md](vision.md) | What zailc is for, in the owner's words, and how it differs from zilc |
-| [design-decisions.md](design-decisions.md) | The decisions table (name, Zig pin, zilc as oracle, byte-identical outputs, WSL-only, licence, Bun tools, a push to `main` releases, …) and the open questions |
-| [roadmap.md](roadmap.md) | Step 2 and step 3 broken into checkable items; what the cosmo evaluation and platform scope leave for zailc |
+| [vision.md](vision.md) | What zailc is for, in the owner's words, how it differs from zilc, and the zail language after the first release |
+| [design-decisions.md](design-decisions.md) | The decisions table (name, Zig pin, zilc as oracle, byte-identical outputs, WSL-only, licence, Bun tools, a push to `main` releases, the compatibility gate, the zail language's types, operators and `zail.json`, …), the open questions, and the **forward path** (Zig 0.15.2 → 0.17.0, the ZLS rule) |
+| [roadmap.md](roadmap.md) | Step 2 and step 3 broken into checkable items; the Zig version path; the zail language goals; what the cosmo evaluation and platform scope leave for zailc |
 | [oracle.md](oracle.md) | How zilc and Fil-C serve as the oracle: trees, versions, hashes, the comparison procedure |
-| [upstream.md](upstream.md) | Pinned Fil-C (v0.686, `163fae5`) and Zig (0.15.2); where they live in WSL |
+| [upstream.md](upstream.md) | Pinned Fil-C (v0.686, `163fae5`) and Zig (0.15.2, then 0.17.0); where they live in WSL |
 | [releasing.md](releasing.md) | 🔖 Release rules (from binaryang, 2026-10-08): SemVer 2.0.0 from `0.1.0`, no cap, merge unbumped then bump on the owner's go, the release gate, patch-from-branch, preflight, CI-only binaries |
 | [unreleased.md](unreleased.md) | What `main` holds beyond the last release; becomes `CHANGELOG.md` § version at release |
 | [testing.md](testing.md) | The gates and their last results |

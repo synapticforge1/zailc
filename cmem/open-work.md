@@ -7,14 +7,19 @@ file that now holds the substance. The full dated narrative this file replaces (
 
 ## Status (2026-10-27)
 
-- **Paused since 2026-10-09 (night)** (owner: "update the project memory files and pause here for
-  today"); only maintenance since: the Bun port (`2e0e650`), the org move (`f194fc9`), and the
-  workspace-floor conformance (2026-10-27, this file's commit).
+- **Step 2 paused since 2026-10-09 (night)** (owner: "update the project memory files and pause
+  here for today"); no runtime work since. Since then: the Bun port (`2e0e650`), the org move
+  (`f194fc9`), and on 2026-10-27 the workspace-floor conformance (`dacd426`), the compatibility
+  gate (`1455c16`), the history purge (force-pushed), and the **zail language direction and the
+  Zig version path** (decisions only, nothing built: `roadmap.md` §§ "The Zig version path",
+  "Beyond the first release"; `design-decisions.md`).
 - **Release:** version `0.1.0` in `build.zig.zon`; nothing released, no tag. 🚦 The release gate
   (`.github/release-gate`) is `closed`: `main` takes finished branches and is pushed, CI runs,
   auto-tag releases nothing. Opening it is the owner's call (`releasing.md`).
-- **Git:** `main` = `origin/main` at `f194fc9` before this commit; merged branches are kept
-  (owner, 2026-10-08). Check rather than trust this line: `git log --oneline --first-parent
+- **Git (2026-10-27):** `main` pushed to `origin/main` with this file's commit; merged branches
+  are kept locally (owner, 2026-10-08) and only `main`, `step2/stock-runtime` and
+  `docs/state-2026-10-08` exist on `origin`. Commit ids quoted before 2026-10-27 are pre-purge:
+  `history-purge-2026-10-27.md`. Check rather than trust this line: `git log --oneline --first-parent
   origin/main..main`, `git branch -r`, `git tag`. Several sessions may commit here: re-read
   `git log` before merging into `main`.
 - **Repository:** `github.com/synapticforge1/zailc` since 2026-10-22 (`origin` uses it).
@@ -56,7 +61,9 @@ lists, a `verify-*.ts` symbol oracle against the release tarball, then into the 
 | 2026-10-22 | Repository moved to `synapticforge1` | `f194fc9` | `design-decisions.md` |
 | 2026-10-27 | Workspace floor: drive paths out of HEAD, ★ block, privacy path test, no version cap, exFAT `.git` fix, this file | `dacd426` | `best-practices.md` §§ 6, 8; `releasing.md`; `local/environment.md` (gitignored) |
 | 2026-10-27 | The compatibility gate: surface snapshot, floor-refusing `bump.ts`, CI and tag checks; inverted 16/16 | `1455c16` | `releasing.md` § "The compatibility gate", `testing.md` |
-| 2026-10-27 | History purged of drive paths (H19): 67 commits rewritten, force-pushed with lease | (the commit adding the record) | `history-purge-2026-10-27.md` (the old → new map) |
+| 2026-10-27 | History purged of drive paths (H19): 67 commits rewritten, force-pushed with lease | `b325c49` | `history-purge-2026-10-27.md` (the old → new map) |
+| 2026-10-27 | The zail language direction (owner): `.zail`, one `string`, `int`/`float` + Zig's numeric set, `/` and `\`, one `zail.json` generating `build.zig`/`build.zig.zon`, packages from URLs and Git | `e03f98e` … `40e3094` | `roadmap.md` § "Beyond the first release", `design-decisions.md` |
+| 2026-10-27 | The Zig version path (owner): 0.15.2 until cross-platform, then 0.17.0 (LLVM 22.1.8, loop vectorizer off); every move waits for ZLS | `7dcba5b` … `1ef2c04` | `roadmap.md` § "The Zig version path", `design-decisions.md` § "Forward path" |
 
 ## Workspace correspondence (letters addressed to zailc)
 
