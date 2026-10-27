@@ -245,7 +245,8 @@ Selected 2026-10-08 (owner: "copy in the ones that are relevant to our specific 
   binaries: `git grep -n -i -E '[A-Za-z]:[\\/]+(Programs|Users|scoop|tools)[\\/]|/[a-z]/(Programs|Users)/'`,
   once with `-I` and once with `-a`. A secret that reached the remote is ROTATED, not just deleted.
   History is purged of personal information as well (owner, 2026-10-22; letter H19): zailc's
-  purge is pending (`open-work.md`).
+  was purged on 2026-10-27 (`history-purge-2026-10-27.md`, with the old → new id map). The scan
+  also matches the `C:/Users/<user>/` placeholder: a candidate, judged fine by the test.
 - **Never run a formatter on `cmem/`.** `deno fmt cmem/<file>` rewrapped 862 lines around a 10-line
   edit and renumbered IDs (binaryang). Edit cmem by hand and keep lines under 100 columns.
 
@@ -260,7 +261,7 @@ Selected 2026-10-08 (owner: "copy in the ones that are relevant to our specific 
   `read-tree HEAD`, `hash-object -w` + `update-index --cacheinfo` with only your hunks,
   `commit-tree`), create the merge with `commit-tree -p main -p <branch>`, move `main` with
   `update-ref` (giving the old value), then `git reset -q -- <your paths>`. Their edits stay
-  uncommitted and untouched (zailc, 2026-10-08, commit `15ab768`).
+  uncommitted and untouched (zailc, 2026-10-08, commit `b01f05d`).
 - **Commit messages go through a file** (`git commit -F <file>`) written with the file tools, never
   a heredoc or a double-quoted `-m`. Every message ends with the session's attribution line.
 - **Merged branches are KEPT, never deleted** (owner, 2026-10-08: "keep the branches"): each

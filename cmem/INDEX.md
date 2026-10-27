@@ -63,4 +63,5 @@ zailc is under the workspace floor (`../cmem/working-rules.md`, `memory-conventi
 | [workarounds.md](workarounds.md) | Every workaround and its WHY (template, families); look new failures up here first |
 | [best-practices.md](best-practices.md) | Rules of work: this machine, proving a port, upstreams, defects, gates, records (incl. the privacy rule), git; § 8 the workspace ★ block, copied verbatim |
 | [licensing.md](licensing.md) | Dual licence, and why a translation project must keep upstream's notices on every ported file |
+| [history-purge-2026-10-27.md](history-purge-2026-10-27.md) | The drive-path purge of git history (H19): method, verification, and the **old → new commit-id map** for any id quoted before 2026-10-27 |
 | `local/` | Gitignored, absent in a clone: this machine's real paths and local git settings (`environment.md`) |
