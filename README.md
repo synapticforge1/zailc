@@ -32,6 +32,16 @@ generators; a user's `zig build` may rely on Zig alone, so they become Zig.
   written into the Fil-C tree. Not yet in it: the five objects Fil-C's own clang compiles
   (`filc/src`), yolo musl's libraries and compiler-rt's builtins.
 
+### ⚠️ Breaking Changes
+
+Nothing released yet. A release that removes or changes anything in zailc's surface
+(`tools/release/surface.txt`: `zailc-gen`'s commands, `zig build` steps and options, the
+libraries it installs, `ZAILC_*` variables, generated output) gets a row here, written when the
+change lands (`_next release_` until it ships).
+
+| Version | What changed | How to migrate |
+| --- | --- | --- |
+
 ## How to run
 
 Everything runs inside Linux (WSL2 on the development machine; nothing built here is ever

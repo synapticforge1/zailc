@@ -61,12 +61,39 @@ this repo concurrently: re-read `git log` before merging into `main`.
   is exactly `zailc-gen <version>`. CI checks it against build.zig.zon on every push, and
   `publish.yml` checks the shipped binary's against the tag (binaryang's `checkEntry`). Done
   2026-10-09.
-- ⏳ **A bump is gated, never judged** (🔒 workspace owner rule, 2026-09-20,
-  `../cmem/layout-and-packaging.md` § "The compatibility gate"): the bump script diffs a committed
-  surface snapshot, prints the floor (patch / minor / major) with the names that set it, and
-  refuses a lower bump; CI repeats the check on the tag. **Not built yet** (2026-10-27:
-  `tools/release/bump.ts` takes the level as an argument and checks nothing). Due before the first
-  bump; nothing can ship while the release gate is `closed`. Listed in `open-work.md`.
+
+## The compatibility gate — a bump is gated, never judged
+
+🔒 Workspace owner rule, 2026-09-20 (`../cmem/layout-and-packaging.md` § "The compatibility
+gate"); built here 2026-10-27 (owner: "yes add the bump gate").
+
+- **The surface** is extracted from the source by `tools/release/surface.ts`, never typed:
+  `zailc-gen`'s command shapes (the usage text), its `--version` first line and exit codes; `zig
+  build` steps and `-D` options; installed executables and libraries; the `ZAILC_*` variables any
+  tool reads; Zig modules exported with `b.addModule` (none today); the SHA-256 of both generated
+  files. Each extractor fails when it finds nothing, so a refactor cannot shrink the surface
+  silently. **Not covered** (the negatives): behaviour that keeps every name (workspace rule 3,
+  the previous tag's tests against new source, is not built), object files installed by name
+  (`filc_crt.o`, `crt1.o`, …), the musl headers' bytes, the tools (never shipped).
+- **The snapshot** `tools/release/surface.txt` is committed; CI's "Surface snapshot matches the
+  source" step fails when they differ. **An intended surface change is re-baselined in its OWN
+  commit, with the reason** (`surface.ts --write`); the bump commit never touches it.
+- **The floor** is the diff from the LAST RELEASE TAG's snapshot: anything removed or changed
+  (a renamed command, a removed option, a changed output hash) → MAJOR; only additions → MINOR;
+  nothing → PATCH. `bump.ts` prints it with the lines that set it and refuses a lower bump (also
+  with `--dry-run`). **Before 1.0.0** a MINOR may stand in for a MAJOR floor (SemVer `0.y.z`;
+  workspace rule 6) only once README's `### ⚠️ Breaking Changes` table has a row for
+  `_next release_` or the version; from 1.0.0 it may not. With no tag yet there is nothing to
+  diff: the first release is `v0.1.0` itself.
+- **CI repeats it on the tag**: `publish.yml` runs `surface.ts --release-check <tag>` (previous
+  `v*` tag below it → floor → the actual step must meet it) before building anything.
+- **Inverted 2026-10-27** in a scratch clone, 16/16 as expected: unchanged → patch passes; an
+  unrebaselined rename → refused by `bump.ts` and `--check`; an added `-D` option → patch refused,
+  minor passes; a removed command → patch refused, pre-1.0 minor refused without the README row
+  and passes with it, major passes; a changed output hash → patch refused; after `v1.0.0` a
+  rename → minor refused even with the row, major passes; `--release-check` refuses a `v1.0.1`
+  patch over a major floor, passes `v2.0.0` and the first release; a vanished hash constant →
+  the extractor fails.
 
 ## RULE — the version line ARMS a release; never bump it in the same change that merges
 
@@ -88,9 +115,11 @@ this repo concurrently: re-read `git log` before merging into `main`.
 1. git merge --no-ff <branch> -> main   # version still the RELEASED one
 2. gates on main, in WSL                # testing.md; all must pass; then push main if wanted:
                                         # CI runs, auto-tag finds the tag exists, nothing ships
-3. unreleased.md says PATCH or MINOR; the owner decides to ship
+3. unreleased.md says PATCH, MINOR or MAJOR; the owner decides to ship
    (the first release only: the owner also opens .github/release-gate, closed -> open)
-4. bun run tools/release/bump.ts [patch|minor]       # edits build.zig.zon only
+   any intended surface change is already re-baselined, in its own commit
+4. bun run tools/release/bump.ts [patch|minor|major] # refuses below the surface floor;
+                                                     # edits build.zig.zon only
 5. move unreleased.md's entries into CHANGELOG.md § X.Y.Z
 6. commit 4+5 on a branch, merge --no-ff -> main     # the arming commit, on its own
 7. git push origin main                 # auto-tag tags vX.Y.Z and publish.yml releases it
@@ -128,9 +157,9 @@ belong to the next minor:
 
 | workflow | trigger | does |
 | --- | --- | --- |
-| `ci.yml` | push to `main`, PRs | Zig 0.15.2; `zig fmt --check`; `zig build test` (SHA-256 against Ruby's output); smoke: `zailc-gen header` must hash to Ruby's header, and `zailc-gen --version`'s first line must be `zailc-gen <build.zig.zon version>` |
+| `ci.yml` | push to `main`, PRs | Zig 0.15.2; `zig fmt --check`; the tools' type-check; the surface snapshot check; `zig build test` (SHA-256 against Ruby's output); smoke: `zailc-gen header` must hash to Ruby's header, and `zailc-gen --version`'s first line must be `zailc-gen <build.zig.zon version>` |
 | `auto-tag.yml` | push to `main` | reads the release gate first (`tools/release/gate.ts`): **closed = a notice, green, nothing else**; open: reads `.version` (fails if the line is missing or doubled); if `v<version>` has no tag, pushes the annotated tag and **calls `publish.yml`** |
-| `publish.yml` | `push: tags: [v*]`, or `workflow_call` from auto-tag | **refuses unless the release gate is open at the tagged commit** (before any build or upload); checks the tag matches `build.zig.zon`, runs the gates, builds `zailc-gen` (`ReleaseSafe`, `x86_64-linux-musl`), smoke-tests the binary FROM THE ARCHIVE (Ruby's header hash, and `--version` naming the tag's version), attests build provenance, creates the GitHub Release with the archives and `SHA256SUMS`; notes from `CHANGELOG.md` § X.Y.Z, else generated |
+| `publish.yml` | `push: tags: [v*]`, or `workflow_call` from auto-tag | **refuses unless the release gate is open at the tagged commit** (before any build or upload); checks the tag matches `build.zig.zon`, runs the compatibility gate against the previous tag (full history checked out), runs the gates, builds `zailc-gen` (`ReleaseSafe`, `x86_64-linux-musl`), smoke-tests the binary FROM THE ARCHIVE (Ruby's header hash, and `--version` naming the tag's version), attests build provenance, creates the GitHub Release with the archives and `SHA256SUMS`; notes from `CHANGELOG.md` § X.Y.Z, else generated |
 
 - **Release binaries are built by `publish.yml` only, never locally and uploaded by hand.** This is
   binaryang's "never run `deno publish` locally": a hand-uploaded binary carries no attestation,

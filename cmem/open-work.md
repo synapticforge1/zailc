@@ -38,8 +38,9 @@ lists, a `verify-*.ts` symbol oracle against the release tarball, then into the 
   every commit and every kept branch, so it needs a force-push: 🗓️ OWNER. Template: workspace
   `handoffs.md` H19 (loader-dotnet's `filter-branch` recipe; no `git filter-repo`, it needs
   Python); record the old → new map here; `gc --prune=now` after.
-- ⏳ **The compatibility gate on `tools/release/bump.ts`** (🔒 workspace rule; `releasing.md`
-  § "The version scheme"). Due before the first bump.
+- ⏳ **Workspace compatibility rule 3, behaviour carried forward**: the previous release tag's
+  tests run against new source before a patch or minor (`releasing.md` § "The compatibility
+  gate", the negatives). Due before the first bump after `v0.1.0`.
 
 ## Done (summary; the substance is in the file named)
 
@@ -57,7 +58,8 @@ lists, a `verify-*.ts` symbol oracle against the release tarball, then into the 
 | 2026-10-09 | compiler-rt (`zig build compiler-rt`); Fil-C's `_Float16` defect kept fixed | `7a7d7e7` | `testing.md`, `workarounds.md` W-10, `UPSTREAM-ISSUES.md` |
 | 2026-10-22 | Tools in Bun only, Deno dropped; `tools/dev/typecheck.ts` replaces `deno check` | `228bcd6` | `best-practices.md` § 1, `design-decisions.md`, `testing.md` |
 | 2026-10-22 | Repository moved to `synapticforge1` | `ab5ce21` | `design-decisions.md` |
-| 2026-10-27 | Workspace floor: drive paths out of HEAD, ★ block, privacy path test, no version cap, exFAT `.git` fix, this file | (this commit) | `best-practices.md` §§ 6, 8; `releasing.md`; `local/environment.md` (gitignored) |
+| 2026-10-27 | Workspace floor: drive paths out of HEAD, ★ block, privacy path test, no version cap, exFAT `.git` fix, this file | `465223e` | `best-practices.md` §§ 6, 8; `releasing.md`; `local/environment.md` (gitignored) |
+| 2026-10-27 | The compatibility gate: surface snapshot, floor-refusing `bump.ts`, CI and tag checks; inverted 16/16 | (this commit) | `releasing.md` § "The compatibility gate", `testing.md` |
 
 ## Workspace correspondence (letters addressed to zailc)
 
