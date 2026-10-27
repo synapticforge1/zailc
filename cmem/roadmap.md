@@ -82,6 +82,9 @@ same objects or same behaviour where code is compiled.
    ships with LLVM's loop vectorization DISABLED (a miscompilation workaround,
    llvm/llvm-project#186922; Zig's release notes say 0.18.0 and LLVM 23 restore it): slower
    loop-heavy code, not less safe; speed comparisons across the move must name the Zig version.
+   0.17.0 stays the plan (owner: "since it just released"); 0.18.0 is not awaited.
+3. **Every Zig move waits for ZLS** (owner's standing practice): zailc moves to a Zig version
+   only once ZLS, the Zig Language Server, has a release for it.
    Details: `design-decisions.md` § "Forward path".
 
 ## Beyond the first release — the zail language (owner, 2026-10-27)
