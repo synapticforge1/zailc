@@ -1,11 +1,14 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR MIT
 //
 // Bumps `.version` in build.zig.zon, the one place zailc's version lives (cmem/releasing.md).
-// Sub-versions are capped at 9: 0.1.9 -> 0.2.0, 0.9.9 -> 1.0.0, the major is uncapped.
+// Semantic Versioning 2.0.0: components are unbounded and nothing carries (0.1.9 -> 0.1.10).
 //
 //   bun run tools/release/bump.ts [patch|minor|major] [--dry-run]
 //
-// PATCH is the default; MINOR is for any break, behavioural ones included. With the release gate
+// PATCH is the default; MINOR for an addition, and before 1.0.0 for any break, behavioural ones
+// included; from 1.0.0 a break is MAJOR. The level is still chosen by hand: the compatibility gate
+// the workspace requires (a surface diff that refuses a lower bump) is not built yet
+// (cmem/releasing.md). With the release gate
 // open (.github/release-gate), the bump ARMS a release: pushing it to main makes auto-tag.yml tag
 // and publish it. So it is its own commit,
 // made on the owner's go, and never part of a merge. This tool only edits the file. It doesn't
@@ -38,8 +41,6 @@ const old = `${x}.${y}.${z}`;
 if (kind === "patch") z += 1;
 if (kind === "minor") [y, z] = [y + 1, 0];
 if (kind === "major") [x, y, z] = [x + 1, 0, 0];
-if (z > 9) [y, z] = [y + 1, 0];
-if (y > 9) [x, y] = [x + 1, 0];
 const next = `${x}.${y}.${z}`;
 
 if (dryRun) {

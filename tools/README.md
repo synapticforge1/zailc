@@ -34,7 +34,7 @@ the tool inside WSL. **Nothing a tool builds is ever executed on the Windows hos
 | `runtime/corpus-run.ts` | builds zilc's `tests/basics` (Zig and C) with zilc from a copy, links each against upstream's runtime and ours, and runs both as zilc-check.ts runs its programs (`["c zig"] [name ...]`; MODE, JOBS) |
 | `runtime/lib/two-runtimes.ts` | the runtime oracle's shared half: the overlay, the two static links with the link-map proof, the panic normaliser |
 | `release/gate.ts` | prints the release gate's state (`.github/release-gate`): `open` or `closed`, exit 1 on anything else; the one reader, used by `auto-tag.yml`, `publish.yml` and `bump.ts` |
-| `release/bump.ts` | bumps `.version` in `build.zig.zon` (`patch` default, `minor`, `major`; sub-versions capped at 9; `--dry-run`). Edits only; pushing the bump to `main` releases it (`cmem/releasing.md`) |
+| `release/bump.ts` | bumps `.version` in `build.zig.zon` (`patch` default, `minor`, `major`; SemVer, no cap, nothing carries; `--dry-run`). Edits only; pushing the bump to `main` releases it (`cmem/releasing.md`) |
 
 Environment: `ZAILC_ZIG` (Zig 0.15.2 binary), `ZAILC_FILC_SRC` (a full Fil-C checkout at the
 pinned commit), `ZAILC_FILC_PREBUILT` (the unpacked Fil-C release tarball, the oracle for

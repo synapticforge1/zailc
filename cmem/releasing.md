@@ -4,7 +4,7 @@
 rules up and adopt them."** Source: binaryang's `cmem/publishing.md` § "The release process",
 § "RULE — never bump the version in the same change that merges to `main`", § "Version rule",
 § "1.6.1 — a patch from a branch", its `cmem/unreleased.md` and `cmem/working-rules.md`
-(binaryang at `778beef6e`, `../binaryang`).
+(binaryang at `778beef6e`, the sibling checkout `../binaryang`).
 Copied here as rules, adapted where binaryang's mechanics (JSR, `deno.json`, `deno task bump`)
 do not exist in a Zig project; each adaptation is marked 🔧.
 
@@ -41,10 +41,14 @@ this repo concurrently: re-read `git log` before merging into `main`.
 - **The upstreams are NOT in the number.** Fil-C's version and commit and the Zig version are
   recorded in `upstream.md` and printed by `zailc-gen --version` (the Zig that built it; the Fil-C
   release and commit its forwarder tables were imported from).
-- **Sub-version capped at 9** (binaryang's rule): `0.1.9 → 0.2.0`, `0.9.9 → 1.0.0`, major uncapped
-  (`9.9.9 → 10.0.0`).
-- **PATCH is the default.** A release is a patch unless it breaks something.
-- **MINOR when it breaks something, decided and typed deliberately.** A removed or renamed public
+- 🔒 **Semantic Versioning 2.0.0; components are unbounded and nothing ever carries** (workspace
+  owner rule, 2026-09-20: `../cmem/working-rules.md` § Git, drift W6). `0.1.9 → 0.1.10`, never
+  `0.2.0`. *(Retired 2026-10-27: "Sub-version capped at 9 (binaryang's rule)", adopted here
+  2026-10-08 after the owner had already retired every cap; workspace drift X10, letter H26.)*
+- **PATCH is the default.** A release is a patch unless it adds or breaks something; a
+  backward-compatible addition is a MINOR.
+- **Before 1.0.0, MINOR when it breaks something; from 1.0.0, MAJOR** (SemVer: `0.y.z` may break
+  in a minor; the major is the break signal after that). Decided and typed deliberately. A removed or renamed public
   name (CLI command, flag, build option, exported Zig declaration, env var), a changed default, or a
   changed output counts as **breaking whether or not anyone is known to depend on it**, because you
   cannot know that nothing did. **A behavioural break counts too** (binaryang: an option that
@@ -57,6 +61,12 @@ this repo concurrently: re-read `git log` before merging into `main`.
   is exactly `zailc-gen <version>`. CI checks it against build.zig.zon on every push, and
   `publish.yml` checks the shipped binary's against the tag (binaryang's `checkEntry`). Done
   2026-10-09.
+- ⏳ **A bump is gated, never judged** (🔒 workspace owner rule, 2026-09-20,
+  `../cmem/layout-and-packaging.md` § "The compatibility gate"): the bump script diffs a committed
+  surface snapshot, prints the floor (patch / minor / major) with the names that set it, and
+  refuses a lower bump; CI repeats the check on the tag. **Not built yet** (2026-10-27:
+  `tools/release/bump.ts` takes the level as an argument and checks nothing). Due before the first
+  bump; nothing can ship while the release gate is `closed`. Listed in `open-work.md`.
 
 ## RULE — the version line ARMS a release; never bump it in the same change that merges
 
