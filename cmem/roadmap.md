@@ -78,17 +78,17 @@ zailc becomes the compiler for a language, **zail**:
 
 - **Syntax similar to TypeScript and Zig.** Source file extension **`.zail`** (first stated as
   `.zls`; changed the same day to avoid ZLS, the Zig Language Server — `design-decisions.md`).
-- **Classes, strings, and numeric types like TypeScript's**: `number` is an f64; loop counters
-  and indexes are signed 64-bit integers by default (decided 2026-10-27); the i64's name
-  (`bigint` or `int`) is open.
+- **Classes, one `string` type, and numbers merged from C, C++, Zig and TypeScript**: inferred
+  `int` (i64) and `float` (f64) for everyday code, the full Zig/C set when needed, no casts in
+  loops or indexes, `/` always true division and `\` integer division (decided 2026-10-27,
+  `design-decisions.md`).
 - **String and array functions like TypeScript's** (its standard methods on strings and arrays).
 - **Compiles a mix of project files — C, C++, Zig and zail (`.zail`) — with Fil-C's safety
   guarantees** across all of them.
 - **A pixi-style package manager and build system.** First stated as "uses pixi"; the owner's
   lean the same day is to design a pixi-like setup of zail's own instead of depending on pixi.
 
-Open questions are in `design-decisions.md` § Open (the package manager vs the "only Zig" rule;
-the i64's name). Steps 2 and 3 above are the foundation: the runtime and the pass are what give
+Open questions are in `design-decisions.md` § Open (the package manager vs the "only Zig" rule). Steps 2 and 3 above are the foundation: the runtime and the pass are what give
 `.zail` code, like Zig and C, Fil-C's guarantees.
 
 ## What the platform scope and the cosmo evaluation leave for zailc (from zilc's `platforms.md`)
