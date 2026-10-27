@@ -25,8 +25,8 @@ binaryang replaced wabt and binaryen:
 | 3 | the pass in Zig, compiled by Zig's own LLVM | scoped (`scope.md`) |
 
 **After the first release (owner, 2026-10-27): zailc becomes the compiler for zail**, a language
-with syntax similar to TypeScript and Zig (`.zls` files), compiling projects that mix C, C++, Zig
-and zail with Fil-C's guarantees, packaged and built with pixi. The goals as stated, and the
+with syntax similar to TypeScript and Zig (`.zail` files), compiling projects that mix C, C++,
+Zig and zail with Fil-C's guarantees, packaged and built by a pixi-style tool. The goals as stated, and the
 questions they open: `roadmap.md` § "Beyond the first release".
 
 ## How zailc differs from zilc
