@@ -76,8 +76,9 @@ same objects or same behaviour where code is compiled.
 1. **Zig 0.15.2** (LLVM 20, Fil-C 0.686's LLVM): steps 2 and 3, the first release, and the zail
    language's development, **until zail is cross-platform** (the platform list at the end of
    this file).
-2. **Then the base moves to Zig 0.17.0** ("the latest version", owner). Needs zailc's own pass
-   to accept that Zig's IR (Zig 0.16 already emits LLVM 21 IR that Fil-C 0.686 cannot read).
+2. **Then the base moves to Zig 0.17.0** ("the latest version", owner), which bundles **LLVM
+   22.1.8** (owner). Needs zailc's own pass to accept LLVM 22 IR, two majors past Fil-C 0.686's
+   LLVM 20 (Zig 0.16 already emits LLVM 21 IR that Fil-C 0.686 cannot read).
    Details: `design-decisions.md` § "Forward path".
 
 ## Beyond the first release — the zail language (owner, 2026-10-27)
