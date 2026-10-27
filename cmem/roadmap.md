@@ -78,7 +78,10 @@ same objects or same behaviour where code is compiled.
    this file).
 2. **Then the base moves to Zig 0.17.0** ("the latest version", owner), which bundles **LLVM
    22.1.8** (owner). Needs zailc's own pass to accept LLVM 22 IR, two majors past Fil-C 0.686's
-   LLVM 20 (Zig 0.16 already emits LLVM 21 IR that Fil-C 0.686 cannot read).
+   LLVM 20 (Zig 0.16 already emits LLVM 21 IR that Fil-C 0.686 cannot read). ⚠️ Zig 0.17.0
+   ships with LLVM's loop vectorization DISABLED (a miscompilation workaround,
+   llvm/llvm-project#186922; Zig's release notes say 0.18.0 and LLVM 23 restore it): slower
+   loop-heavy code, not less safe; speed comparisons across the move must name the Zig version.
    Details: `design-decisions.md` § "Forward path".
 
 ## Beyond the first release — the zail language (owner, 2026-10-27)
