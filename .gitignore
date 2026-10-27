@@ -3,6 +3,9 @@
 .zig-cache/
 zig-out/
 *.o
+# Machine facts (real paths, local git settings) never go in a committed file
+# (cmem/best-practices.md § 6, the privacy rule).
+/cmem/local/
 # The tools' type-check installs into a copy in ~/zailc-work (tools/dev/typecheck.ts); this catches
 # an install run in the checkout itself.
 node_modules/

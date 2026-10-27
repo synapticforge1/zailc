@@ -28,7 +28,7 @@ through stock).
 | Fil-C prebuilt (stock) | `~/zilc-work/tools/filc-0.686-linux-x86_64` | the release tarball |
 | Fil-C with zilc's patches (built) | `~/zilc-work/tools/filc-0.686-zilc` | zilc's `tools/filc/patch-*.ts` |
 | Zig 0.15.2 | `~/zilc-work/tools/zig-0.15.2/zig` | `zig version` → `0.15.2` |
-| zilc | `../zilc` | `v0.15.2-0.686.1` published 2026-10-05 |
+| zilc | the sibling checkout `../zilc`, seen from WSL under `/mnt/<drive>/…` (the real path: `local/environment.md`, gitignored) | `v0.15.2-0.686.1` published 2026-10-05 |
 | Ruby (for the generator oracle) | `/usr/bin/ruby` | 3.3.8 |
 
 zailc's own work area is `~/zailc-work` (`WORK`): `ref/` holds oracle outputs, `gen/` and `out/`

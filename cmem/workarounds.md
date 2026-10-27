@@ -290,7 +290,7 @@ reduced and confirmed the same night.
 - **Class.** zailc's own gap (tooling).
 - **Root cause (measured).** `linuxOnly()` forwards every `ZIG_*` variable into WSL. The Windows
   environment sets `ZIG_LOCAL_CACHE_DIR=C:\Users\<user>\.cache\zig-local\wazmrt` (a sibling
-  project's setting). In WSL that is a relative directory name, so `zig cc` wrote its cache "into"
+  project's setting; the real value: `local/environment.md`, gitignored). In WSL that is a relative directory name, so `zig cc` wrote its cache "into"
   it inside CMake's probe directory, and CMake read the wrong file. Tools that run `zig build` were
   unaffected because they pass `--cache-dir`. `zig cc` under configure or CMake passes none.
 - **Fix.** `tools/lib/tool.ts` `linuxOnly()` never forwards a value that is a Windows path
