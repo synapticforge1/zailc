@@ -71,6 +71,15 @@ same objects or same behaviour where code is compiled.
 - [ ] Oracle: the same Zig module through zilc (Fil-C's pass) and through zailc's pass, compared
       as IR after the pass and as program behaviour.
 
+## The Zig version path (owner, 2026-10-27)
+
+1. **Zig 0.15.2** (LLVM 20, Fil-C 0.686's LLVM): steps 2 and 3, the first release, and the zail
+   language's development, **until zail is cross-platform** (the platform list at the end of
+   this file).
+2. **Then the base moves to Zig 0.17.0** ("the latest version", owner). Needs zailc's own pass
+   to accept that Zig's IR (Zig 0.16 already emits LLVM 21 IR that Fil-C 0.686 cannot read).
+   Details: `design-decisions.md` § "Forward path".
+
 ## Beyond the first release — the zail language (owner, 2026-10-27)
 
 Future goals in the owner's words, recorded as given; nothing here is scoped, sized or started.
