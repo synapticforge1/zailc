@@ -194,6 +194,12 @@ Selected 2026-10-08 (owner: "copy in the ones that are relevant to our specific 
   all reported success). **One authoritative enumeration**: a list written a second time drifts,
   and falling behind produces SILENCE (binaryang `walk.ts`). zailc's imported signature table is
   this rule applied.
+- **A one-time check script is a gate too: invert it before trusting its "0 differ".** The text
+  check of the ★ block first reported 28/28 identical while comparing only each rule's FIRST line
+  (a `$` under the regex `m` flag ends at every line end); a one-word mutant in a continuation line
+  passed it. Fixed and re-inverted: mid-rule and last-line mutants both caught (zailc,
+  2026-10-27). The same day the path scan flagged the `C:/Users/<user>/` placeholder as a hit — a
+  verification pattern must be judged against the rule it checks, then narrowed, not trusted.
 - **Fix the class, not the instance, then guard the class** (binaryang: the `--version` drift fixed
   by a sync test, not by a corrected constant).
 
