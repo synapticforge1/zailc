@@ -85,13 +85,14 @@ zailc becomes the compiler for a language, **zail**:
 - **String and array functions like TypeScript's** (its standard methods on strings and arrays).
 - **Compiles a mix of project files — C, C++, Zig and zail (`.zail`) — with Fil-C's safety
   guarantees** across all of them.
-- **A `bun add`-style package manager over Zig's own files** (decided 2026-10-27; first stated
-  as "uses pixi"): `zail add` / `remove` / `update` maintain `build.zig.zon` and a generated
-  `zail.deps.zig`; `build.zig.zon` and `build.zig` stay the standard, and every dependency is
-  built from source by zailc (`design-decisions.md`).
+- **One `zail.json`, as in Bun and Deno** (decided 2026-10-27; first stated as "uses pixi"):
+  manifest and build description in one file, with comments and `tasks`; `zail add` /
+  `remove` / `update` edit it, `zail.lock` pins versions and hashes, and the toolchain generates
+  `build.zig` / `build.zig.zon` into `.zail/`. Every dependency is built from source by zailc
+  (`design-decisions.md`).
 
-Open questions are in `design-decisions.md` § Open (where the dependency list lives; where
-packages come from). Steps 2 and 3 above are the foundation: the runtime and the pass are what give
+Open question in `design-decisions.md` § Open: where packages come from (URLs, or also a
+registry). Steps 2 and 3 above are the foundation: the runtime and the pass are what give
 `.zail` code, like Zig and C, Fil-C's guarantees.
 
 ## What the platform scope and the cosmo evaluation leave for zailc (from zilc's `platforms.md`)
