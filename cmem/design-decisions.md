@@ -35,4 +35,6 @@
 
 | Raised | Question | Current lean |
 | --- | --- | --- |
-| | *(none open: the last two were closed 2026-10-08 by the 🎯 and 🚦 rows)* | |
+| 2026-10-27 | 🗓️ **pixi as package manager and build system vs the 🎯 "the user installs ONLY Zig and runs `zig build`" (2026-10-08).** The zail goals (`roadmap.md` § "Beyond the first release") name pixi; the first-release definition names Zig alone. Does pixi replace `zig build` as the user's entry point after the first release (pixi then installing Zig), or wrap it, or does the first-release rule stand for the runtime while zail projects use pixi? | none — owner call. Note: pixi is already the workspace's sanctioned Python (loader-py), so it is a known tool here |
+| 2026-10-27 | 🗓️ **The `.zls` extension.** "zls" is widely known as the Zig Language Server (ZLS), which every Zig editor setup installs; a `.zls` file and a `zls` binary would be confused with it in editors, search and issue reports. Keep `.zls`, or pick another (e.g. `.zail`)? | none — owner call |
+| 2026-10-27 | 🗓️ **"Numerical types like TypeScript."** TypeScript has one `number` (an f64) and `bigint`; Zig has sized integers and floats. Does zail have only `number`/`bigint`, or TS-style names over Zig's sized types? Related: the owner's 2026-10-26 direction for wasmtk's TS subset is `number` = f64, no hints (workspace `open-work.md`) — the same question in a sibling | none — owner call |

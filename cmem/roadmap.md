@@ -71,6 +71,22 @@ same objects or same behaviour where code is compiled.
 - [ ] Oracle: the same Zig module through zilc (Fil-C's pass) and through zailc's pass, compared
       as IR after the pass and as program behaviour.
 
+## Beyond the first release — the zail language (owner, 2026-10-27)
+
+Future goals in the owner's words, recorded as given; nothing here is scoped, sized or started.
+zailc becomes the compiler for a language, **zail**:
+
+- **Syntax similar to TypeScript and Zig.** Source file extension **`.zls`**.
+- **Classes, strings, and numeric types like TypeScript's.**
+- **String and array functions like TypeScript's** (its standard methods on strings and arrays).
+- **Compiles a mix of project files — C, C++, Zig and zail (`.zls`) — with Fil-C's safety
+  guarantees** across all of them.
+- **pixi is the package manager and build system.**
+
+Open questions these raise are in `design-decisions.md` § Open (pixi vs the "only Zig" goal; the
+`.zls` name; what "numeric types like TypeScript" means). Steps 2 and 3 above are the foundation:
+the runtime and the pass are what give `.zls` code, like Zig and C, Fil-C's guarantees.
+
 ## What the platform scope and the cosmo evaluation leave for zailc (from zilc's `platforms.md`)
 
 - Linux x86_64 is the host and target of everything above; Linux aarch64 next (four small gaps in
