@@ -44,6 +44,11 @@ jobs:
       - name: Type-check the tools
         run: bun run tools/dev/typecheck.ts
 
+      # The compatibility gate's baseline (cmem/releasing.md): a surface change must arrive as a
+      # deliberate re-baseline commit of tools/release/surface.txt, never unnoticed.
+      - name: Surface snapshot matches the source
+        run: bun run tools/release/surface.ts --check
+
       - name: Unit and byte-identity tests
         run: zig build test --summary all
 

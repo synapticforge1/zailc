@@ -8,6 +8,7 @@ exact command.
 | gate | command (from the repo, inside WSL; or via the Bun tool from Windows) | what it proves |
 | --- | --- | --- |
 | tools type-check | `bun run tools/dev/typecheck.ts` (also a CI step) | every tool type-checks under `tsc` with `@types/bun`, both pinned in `tools/bun.lock` (`bun install --frozen-lockfile` on a copy in `$WORK/tools-check`) |
+| surface snapshot | `bun run tools/release/surface.ts --check` (also a CI step; runs on Windows, no build) | the surface extracted from the source equals the committed `tools/release/surface.txt`, so a surface change arrives only as a re-baseline commit (`releasing.md` § "The compatibility gate"). Inverted 2026-10-27, 16/16 |
 | unit tests | `zig build test` (Zig 0.15.2; add `--cache-dir ~/zailc-work/zig-cache --global-cache-dir ~/zailc-work/zig-global-cache` on the exFAT checkout) | `sig.zig` helpers; the tables validate and have 453 + 13 rows; both generated files have Ruby's exact length and SHA-256 |
 | Ruby diff | `bun run tools/gen/verify-forwarders.ts` | `zailc-gen` and a live run of upstream's Ruby script produce identical bytes |
 | musl headers | `bun run tools/gen/verify-musl-headers.ts` | `zailc-gen musl-headers` and upstream's `./configure && make install-headers` produce identical trees (`diff -r`) |
