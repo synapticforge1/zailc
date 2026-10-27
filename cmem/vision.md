@@ -35,7 +35,7 @@ questions they open: `roadmap.md` § "Beyond the first release".
 | | zilc | zailc |
 | --- | --- | --- |
 | purpose | the stable, upstream-faithful reference; follows Zig and Fil-C releases | the translation into Zig; fixes and clean-ups where upstream left them |
-| version line | `<Zig>-<Fil-C>.<release>`, moves with upstream | **Zig 0.15.2 until proven equal to zilc** |
+| version line | `<Zig>-<Fil-C>.<release>`, moves with upstream | **Zig 0.15.2 until proven equal to zilc and cross-platform; then a Zig 0.17.0 base** (owner, 2026-10-27) |
 | role in testing | the oracle: its outputs are what zailc must reproduce | the subject |
 | the pass | never ported; called externally | ported to Zig (step 3) |
 | development | | AI-assisted, with every decision and its why recorded in `cmem/` |
