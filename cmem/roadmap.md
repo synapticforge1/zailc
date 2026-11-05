@@ -7,6 +7,17 @@
 > step 2 and step 3 sections below are zailc's record of its 0.686 work, closed; zilc continues
 > them. What zailc owns now: the next section. (`design-decisions.md`, the split row.)
 
+## ▶️ The order of work (owner, 2026-11-05)
+
+Releases: **nightlies until the MVP; the MVP is the first release, `0.0.1`**.
+
+1. **The x86-64 version first**: zail on Linux x86_64, zilc's platform (and so zilc as the
+   oracle for every piece); other targets follow it.
+2. **A runtime written in Zig** (below, zilc's former P3).
+3. **zail's grammar is TypeScript's syntax** (the zail section below).
+4. **The Zig 0.17.1 move starts with the first nightly** (the version path below) — which makes
+   a pass that reads LLVM 22 IR the first hard problem.
+
 ## What zailc owns (owner, 2026-10-27)
 
 zailc builds on zilc's pure-Zig result ("the corpus of truth") and keeps everything that departs
@@ -111,11 +122,15 @@ All four items below are zilc's now. zailc still needs the result for the Zig mo
 
 ## The Zig version path (owner, 2026-10-27)
 
+> 🔁 **2026-11-05 (owner): "the zig 0.17.1 move will start with the first nightly version."**
+> The move no longer waits for cross-platform: item 1 ends when the first nightly is built, and
+> that nightly is on Zig 0.17.1. Needs first: a Fil-C pass that accepts LLVM 22 IR (Fil-C 0.687's
+> reads LLVM 20; zilc's Zig pass is not started) — `design-decisions.md` § "Forward path".
+
 1. **Zig 0.15.2** (LLVM 20, the LLVM of Fil-C 0.686 and 0.687; zilc's Zig): zailc's work on top
-   of zilc's pure-Zig track — departures, the cross-platform work, the zail language — **until
-   zail is cross-platform** (the platform list at the end of
-   this file).
-2. **Then the base moves to Zig 0.17.0** ("the latest version", owner), which bundles **LLVM
+   of zilc's pure-Zig track **until the first nightly** (first written as "until zail is
+   cross-platform", 2026-10-27).
+2. **Then the base moves to Zig 0.17.0 (now 0.17.1), with the first nightly** ("the latest version", owner), which bundles **LLVM
    22.1.8** (owner). Needs zailc's own pass to accept LLVM 22 IR, two majors past Fil-C 0.686's
    LLVM 20 (Zig 0.16 already emits LLVM 21 IR that Fil-C 0.686 cannot read). ⚠️ Zig 0.17.0
    ships with LLVM's loop vectorization DISABLED (a miscompilation workaround,
@@ -129,12 +144,16 @@ All four items below are zilc's now. zailc still needs the result for the Zig mo
    only once ZLS, the Zig Language Server, has a release for it.
    Details: `design-decisions.md` § "Forward path".
 
-## Beyond the first release — the zail language (owner, 2026-10-27)
+## The zail language (owner, 2026-10-27; first release `0.0.1` decided 2026-11-05)
 
-Future goals in the owner's words, recorded as given; nothing here is scoped, sized or started.
-zailc becomes the compiler for a language, **zail**:
+Goals in the owner's words, recorded as given; nothing here is scoped, sized or started. (The
+heading was "Beyond the first release" until 2026-11-05, when zail's own `0.0.1` MVP became the
+first release.) zailc becomes the compiler for a language, **zail**:
 
-- **Syntax similar to TypeScript and Zig.** Source file extension **`.zail`** (first stated as
+- **TypeScript's syntax** (owner, 2026-11-05: "zail grammar/syntax will be typescript syntax";
+  first stated 2026-10-27 as "similar to TypeScript and Zig"). Proposed, pending the owner: the
+  type and operator decisions below stay as zail's additions to it (`int`/`float` and Zig's
+  sized types; `\`). Source file extension **`.zail`** (first stated as
   `.zls`; changed the same day to avoid ZLS, the Zig Language Server — `design-decisions.md`).
 - **Classes, one `string` type, and numbers merged from C, C++, Zig and TypeScript**: inferred
   `int` (i64) and `float` (f64) for everyday code, the full Zig/C set when needed, no casts in

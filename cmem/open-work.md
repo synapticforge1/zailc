@@ -12,8 +12,9 @@ file that now holds the substance. The full dated narrative this file replaces (
   zailc's old resume point. zailc's step-2 code and records here are the 0.686 history. **zailc
   owns** its departures (W-10), cross-platform (Linux aarch64 included), a runtime in Zig, Zig
   language fidelity, C++ and polish, the newer-Zig path (0.17.1) and the zail language
-  (`roadmap.md` § "What zailc owns"). No zailc work item is active; the next one is the owner's
-  call (below).
+  (`roadmap.md` § "What zailc owns"). **Next (owner, 2026-11-05): the x86-64 version first**, then
+  a runtime in Zig, TypeScript's syntax for zail, and Zig 0.17.1 from the first nightly. **Release
+  plan:** nightlies until the MVP; the MVP is the first release, `0.0.1` (below).
 - Since the 2026-10-09 pause: the Bun port (`2e0e650`), the org move (`f194fc9`); on 2026-10-27
   the workspace-floor conformance (`dacd426`), the compatibility gate (`1455c16`), the history
   purge (`b325c49`), the zail language direction and the Zig version path (decisions only); on
@@ -29,27 +30,33 @@ file that now holds the substance. The full dated narrative this file replaces (
   `git log` before merging into `main`.
 - **Repository:** `github.com/synapticforge1/zailc` since 2026-10-22 (`origin` uses it).
 
-## ▶️ Resume here: 🗓️ the owner picks zailc's next work item
+## ▶️ Resume here: the x86-64 version first (owner, 2026-11-05)
 
-The old resume point (yolo musl's shared half) was done in zilc on 2026-10-27 (C25). Candidates,
-from what zailc owns (`design-decisions.md` § Open): **Linux aarch64** (zilc's `platforms.md`
-lists four small gaps); **a runtime written in Zig** (zilc's former P3); **the zail language's
-grammar**; preparing **the Zig 0.17.1 move** (once ZLS supports it). Also open there: what zailc's
-first release is now. The method that served step 2 still applies to whichever comes next: an
-importer for upstream's lists, an oracle against the release, the two-runtime overlay
+The order (`roadmap.md` § "The order of work"): **(1) the x86-64 version first** (zail on Linux
+x86_64, zilc's platform and oracle); **(2) a runtime written in Zig** (zilc's former P3); **(3)
+zail's grammar is TypeScript's syntax**; **(4) the Zig 0.17.1 move starts with the first
+nightly**. Releases: nightlies until the MVP, which is the first release, `0.0.1`. Nothing of
+this is scoped or started yet; the first concrete step is scoping item 1 — what "the x86-64
+version" must contain — against zilc's pure-Zig track. The method that served step 2 still
+applies: an importer for upstream's lists, an oracle against the release, the two-runtime overlay
 (`link-run.ts`, `corpus-run.ts`).
 
 ## Open
 
-- 🗓️ **zailc's first release, redefined** and **its next work item** — owner calls
-  (`design-decisions.md` § Open).
+- 🗓️ **Follow-ups of the 2026-11-05 release decision** (`design-decisions.md`, the `0.0.1` row):
+  `build.zig.zon` reads `0.1.0` and must read `0.0.1` before the release gate opens; how a
+  nightly is numbered and published; what the MVP contains.
+- ⚠️ **The first nightly needs a Fil-C pass that reads LLVM 22 IR** (Zig 0.17.1's; Fil-C 0.687's
+  pass reads LLVM 20, zilc's Zig pass is not started) — `design-decisions.md` § "Forward path".
+- 🗓️ **Pending owner confirmation:** the 2026-10-27 type and operator decisions (`int`/`float`,
+  Zig's sized types, `\`) stay as zail's additions to TypeScript's syntax.
 - **W-7's exact line** in `FilPizlonator.cpp` (surmised: `scheduleChecks`; `workarounds.md` W-7).
   Not blocking.
 - 🗓️ **GitHub still serves the pre-purge commits by hash** until its own garbage collection; a
   full removal is a GitHub Support request (owner; `history-purge-2026-10-27.md`).
 - ⏳ **Workspace compatibility rule 3, behaviour carried forward**: the previous release tag's
   tests run against new source before a patch or minor (`releasing.md` § "The compatibility
-  gate", the negatives). Due before the first bump after `v0.1.0`.
+  gate", the negatives). Due before the first bump after `v0.0.1`.
 
 ## Done (summary; the substance is in the file named)
 
@@ -70,9 +77,10 @@ importer for upstream's lists, an oracle against the release, the two-runtime ov
 | 2026-10-27 | Workspace floor: drive paths out of HEAD, ★ block, privacy path test, no version cap, exFAT `.git` fix, this file | `dacd426` | `best-practices.md` §§ 6, 8; `releasing.md`; `local/environment.md` (gitignored) |
 | 2026-10-27 | The compatibility gate: surface snapshot, floor-refusing `bump.ts`, CI and tag checks; inverted 16/16 | `1455c16` | `releasing.md` § "The compatibility gate", `testing.md` |
 | 2026-10-27 | History purged of drive paths (H19): 67 commits rewritten, force-pushed with lease | `b325c49` | `history-purge-2026-10-27.md` (the old → new map) |
-| 2026-10-27 | The zail language direction (owner): `.zail`, one `string`, `int`/`float` + Zig's numeric set, `/` and `\`, one `zail.json` generating `build.zig`/`build.zig.zon`, packages from URLs and Git | `e03f98e` … `40e3094` | `roadmap.md` § "Beyond the first release", `design-decisions.md` |
+| 2026-10-27 | The zail language direction (owner): `.zail`, one `string`, `int`/`float` + Zig's numeric set, `/` and `\`, one `zail.json` generating `build.zig`/`build.zig.zon`, packages from URLs and Git | `e03f98e` … `40e3094` | `roadmap.md` § "The zail language", `design-decisions.md` |
 | 2026-10-27 | The Zig version path (owner): 0.15.2 until cross-platform, then 0.17.0 (LLVM 22.1.8, loop vectorizer off); every move waits for ZLS | `7dcba5b` … `1ef2c04` | `roadmap.md` § "The Zig version path", `design-decisions.md` § "Forward path" |
 | 2026-11-05 | Zig target 0.17.0 → 0.17.1 (owner; released 2026-11-02) | `582c84d` | `design-decisions.md` § "Forward path" |
+| 2026-11-05 | The owner's answers recorded: first release `0.0.1` (the MVP), nightlies before it; work order x86-64 → runtime in Zig → TypeScript syntax → Zig 0.17.1 from the first nightly | (the commit recording them) | `design-decisions.md`, `roadmap.md` § "The order of work" |
 | 2026-11-05 | The split with zilc recorded (C22–C25): steps 2–3 are zilc's; zailc owns departures (W-10), cross-platform, a Zig runtime, Zig fidelity, C++, newer Zig, zail; first release and next item → owner | (the memory-update commit) | `design-decisions.md` (split row, § Open), `roadmap.md` § "What zailc owns" |
 
 ## Workspace correspondence (letters addressed to zailc)

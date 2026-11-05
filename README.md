@@ -5,17 +5,19 @@ with AI-assisted development. Zig's tool chain and language syntax backbone, wit
 fixes and security hardening. Open book editing of the upstream tools so the upstream projects
 can see what was fixed and the reasons why.
 
-> **Status (2026-11-05): nothing released yet.** zailc grows out of
+> **Status (2026-11-05): nothing released yet. Nightlies come first; the first release, `0.0.1`,
+> is the MVP.** zailc grows out of
 > [zilc](https://github.com/synapticforge1/zilc), which compiles Zig and C through Fil-C's pass
 > and runtime, is zailc's test oracle, and since 2026-10-27 also carries the faithful build of
 > Fil-C in Zig (the runtime from source, then the pass), Linux x86_64 only. zailc builds on that
 > result: its own fixes to upstream, the other platforms (Linux aarch64, macOS, Windows, …),
-> newer Zig, and the zail language. It stays on **Zig 0.15.2** (LLVM 20, Fil-C's LLVM) until it
-> works across platforms; the base then moves to **Zig 0.17.1**, once ZLS supports it.
+> newer Zig, and the zail language. The x86-64 (Linux) version comes first, with a runtime
+> written in Zig. Development is on **Zig 0.15.2** (LLVM 20, Fil-C's LLVM) until the first
+> nightly, which moves to **Zig 0.17.1** (once ZLS supports it).
 >
-> **Beyond that:** zailc becomes the compiler for **zail**, a language with TypeScript- and
-> Zig-like syntax (`.zail` files) that builds projects mixing C, C++, Zig and zail with Fil-C's
-> guarantees, described by one `zail.json` as in Bun and Deno. The plan: `cmem/roadmap.md`.
+> **zail:** zailc becomes the compiler for **zail**, a language with TypeScript's syntax (`.zail`
+> files) that builds projects mixing C, C++, Zig and zail with Fil-C's guarantees, described by
+> one `zail.json` as in Bun and Deno. The plan: `cmem/roadmap.md`.
 
 ## What exists today
 
