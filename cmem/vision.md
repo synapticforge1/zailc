@@ -25,9 +25,12 @@ binaryang replaced wabt and binaryen:
 | 3 | the pass in Zig, compiled by Zig's own LLVM | scoped here (`scope.md`); **🔁 zilc's since 2026-10-27** (its Z2) |
 
 🔁 **The split (owner, 2026-10-27):** zilc builds the faithful Fil-C-in-Zig ("the corpus of
-truth"); zailc builds on it with what departs from it or goes beyond it — its departures, the
-platforms beyond Linux x86_64, a runtime written in Zig, Zig language fidelity, C++, newer Zig,
-and the zail language (`roadmap.md` § "What zailc owns").
+truth"). 🧱 **zailc is a clean slate (owner, 2026-11-05): a new, fully Zig implementation on the
+latest Zig, which reads zilc as its reference corpus** — zilc's tests and examples translated into
+the latest Zig, parity meaning the same result — and owns what departs from zilc or goes beyond
+it: its departures, the platforms beyond Linux x86_64, a runtime written in Zig, Zig language
+fidelity, C++, the latest Zig, and the zail language (`roadmap.md` §§ "The approach", "What zailc
+owns").
 
 **zailc becomes the compiler for zail** (owner, 2026-10-27), a language with **TypeScript's
 syntax** (owner, 2026-11-05; `.zail` files), compiling projects that mix C, C++, Zig and zail with
@@ -40,10 +43,10 @@ zail language"; the order of work: `roadmap.md` § "The order of work".
 
 | | zilc | zailc |
 | --- | --- | --- |
-| purpose | the stable, upstream-faithful reference; follows Fil-C releases and the Zig whose LLVM matches; Linux x86_64 only; since 2026-10-27 also the faithful pure-Zig build | builds on zilc's result: fixes and clean-ups where upstream left them, other platforms, newer Zig, the zail language |
-| version line | `<Zig>-<Fil-C>.<release>`, moves with upstream | **Zig 0.15.2 until the first nightly, which moves to a Zig 0.17.1 base** (owner, 2026-10-27; 0.17.0 → 0.17.1 and "from the first nightly" on 2026-11-05); releases: nightlies, then `0.0.1` (the MVP) |
-| role in testing | the oracle: its outputs are what zailc must reproduce | the subject |
-| the pass | ported to Zig (its Z2, since 2026-10-27) | uses zilc's Zig pass; must take it to newer Zig's LLVM |
+| purpose | the stable, upstream-faithful reference; follows Fil-C releases and the Zig whose LLVM matches; Linux x86_64 only; since 2026-10-27 also the faithful pure-Zig build | a clean-slate implementation in the latest Zig that reads zilc: fixes and clean-ups where upstream left them, other platforms, the latest Zig, the zail language |
+| version line | `<Zig>-<Fil-C>.<release>`, moves with upstream | **the latest Zig, 0.17.1** — the clean-slate implementation is written for it from the start (owner, 2026-11-05; the path ran 0.15.2 → 0.17.0 → 0.17.1); releases: nightlies, then `0.0.1` (the MVP) |
+| role in testing | the oracle and the source of test examples: its results are what zailc must reproduce | the subject: zilc's tests, translated into the latest Zig, must give zilc's results (the same result, not the same bytes) |
+| the pass | Fil-C's; ported to Zig as its Z2 (since 2026-10-27), for its own LLVM | its own pass in Zig, for the latest Zig's LLVM (22 on 0.17.x) |
 | development | | AI-assisted, with every decision and its why recorded in `cmem/` |
 
 "Zag where they zig" is a licence to depart from upstream's design where it is a mess, not from

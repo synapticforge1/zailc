@@ -7,6 +7,10 @@ file that now holds the substance. The full dated narrative this file replaces (
 
 ## Status (2026-11-05)
 
+- 🧱 **zailc is a clean slate (owner, 2026-11-05):** a new implementation written entirely in
+  Zig on the latest Zig (0.17.1), with zilc as its reference corpus — zilc's tests translated into
+  the latest Zig must give zilc's results (`roadmap.md` § "The approach"). zailc's existing code
+  is the 0.686 history, not a base. Nothing of the new implementation exists yet.
 - 🔁 **Steps 2 and 3 are zilc's since 2026-10-27** (owner; `design-decisions.md`, the split row):
   zilc's pure-Zig track continues them on Fil-C 0.687 and has already done yolo musl's shared half,
   zailc's old resume point. zailc's step-2 code and records here are the 0.686 history. **zailc
@@ -37,7 +41,8 @@ x86_64, zilc's platform and oracle); **(2) a runtime written in Zig** (zilc's fo
 zail's grammar is TypeScript's syntax**; **(4) the Zig 0.17.1 move starts with the first
 nightly**. Releases: nightlies until the MVP, which is the first release, `0.0.1`. Nothing of
 this is scoped or started yet; the first concrete step is scoping item 1 — what "the x86-64
-version" must contain — against zilc's pure-Zig track. The method that served step 2 still
+version" of the clean-slate implementation must contain on Zig 0.17.1, which zilc tests it
+translates first, and where the MVP draws the line between rewritten and compiled-from-C pieces. The method that served step 2 still
 applies: an importer for upstream's lists, an oracle against the release, the two-runtime overlay
 (`link-run.ts`, `corpus-run.ts`).
 
@@ -80,6 +85,7 @@ applies: an importer for upstream's lists, an oracle against the release, the tw
 | 2026-10-27 | The zail language direction (owner): `.zail`, one `string`, `int`/`float` + Zig's numeric set, `/` and `\`, one `zail.json` generating `build.zig`/`build.zig.zon`, packages from URLs and Git | `e03f98e` … `40e3094` | `roadmap.md` § "The zail language", `design-decisions.md` |
 | 2026-10-27 | The Zig version path (owner): 0.15.2 until cross-platform, then 0.17.0 (LLVM 22.1.8, loop vectorizer off); every move waits for ZLS | `7dcba5b` … `1ef2c04` | `roadmap.md` § "The Zig version path", `design-decisions.md` § "Forward path" |
 | 2026-11-05 | Zig target 0.17.0 → 0.17.1 (owner; released 2026-11-02) | `582c84d` | `design-decisions.md` § "Forward path" |
+| 2026-11-05 | The clean slate recorded: a new, fully Zig implementation on the latest Zig; zilc as the reference corpus and source of translated tests; parity = same result | (the commit recording it) | `design-decisions.md` (the clean-slate row), `roadmap.md` § "The approach", `oracle.md` |
 | 2026-11-05 | The owner's answers recorded: first release `0.0.1` (the MVP), nightlies before it; work order x86-64 → runtime in Zig → TypeScript syntax → Zig 0.17.1 from the first nightly | (the commit recording them) | `design-decisions.md`, `roadmap.md` § "The order of work" |
 | 2026-11-05 | The split with zilc recorded (C22–C25): steps 2–3 are zilc's; zailc owns departures (W-10), cross-platform, a Zig runtime, Zig fidelity, C++, newer Zig, zail; first release and next item → owner | (the memory-update commit) | `design-decisions.md` (split row, § Open), `roadmap.md` § "What zailc owns" |
 

@@ -7,6 +7,31 @@
 > step 2 and step 3 sections below are zailc's record of its 0.686 work, closed; zilc continues
 > them. What zailc owns now: the next section. (`design-decisions.md`, the split row.)
 
+## 🧱 The approach: a clean slate in the latest Zig, with zilc as the corpus (owner, 2026-11-05)
+
+zailc / zail is a **new implementation written entirely in Zig on the latest Zig** (0.17.1). It
+takes none of zilc's code or history. **zilc is the reference corpus**, read and never written:
+
+- **Tests:** zilc's test programs and examples are translated from Zig 0.15.2 into the latest Zig
+  and become zailc's tests. A translation counts only once it gives zilc's result.
+- **Parity is the same result, not the same bytes** (zilc's rule too): same output, exit code and
+  safety traps; binaries from two Zig versions are never compared byte for byte.
+- **zilc keeps moving with Fil-C**: each Fil-C release zilc takes brings new tests and results
+  for zailc to translate and match.
+- **Notes to start from:** zilc's `Fil-C.md`, `Zig.md`, `platforms.md`, `filc-abi.md`.
+
+What the clean slate makes larger (`design-decisions.md`, the clean-slate row):
+
+1. **The pass in Zig for LLVM 22 is zailc's own** — nothing existing reads Zig 0.17.1's IR — and
+   the first nightly depends on it.
+2. **The runtime and Fil-C's C libraries** (musl, libc++: very large) are eventually zailc's in
+   Zig; the MVP must say which are rewritten and which are compiled from C by zailc.
+3. **Translating tests is porting**: Zig's standard library and build API changed between 0.15.2
+   and 0.17.1.
+
+zailc's existing 0.686 code (`src/gen/`, `src/runtime/`, `tools/`) is history, not a base: the
+fresh implementation arrives as new commits, with no history rewrite.
+
 ## ▶️ The order of work (owner, 2026-11-05)
 
 Releases: **nightlies until the MVP; the MVP is the first release, `0.0.1`**.
@@ -20,8 +45,9 @@ Releases: **nightlies until the MVP; the MVP is the first release, `0.0.1`**.
 
 ## What zailc owns (owner, 2026-10-27)
 
-zailc builds on zilc's pure-Zig result ("the corpus of truth") and keeps everything that departs
-from it or goes beyond Linux x86_64:
+zilc keeps the faithful Fil-C-in-Zig track ("the corpus of truth"); zailc, a clean-slate
+implementation that reads it (section above), owns everything that departs from it or goes
+beyond it — the latest Zig, other platforms:
 
 - **Departures from upstream**, each a recorded decision with its why. Today exactly one:
   **W-10**, `_Float16` converted correctly (`workarounds.md`).
@@ -127,9 +153,11 @@ All four items below are zilc's now. zailc still needs the result for the Zig mo
 > that nightly is on Zig 0.17.1. Needs first: a Fil-C pass that accepts LLVM 22 IR (Fil-C 0.687's
 > reads LLVM 20; zilc's Zig pass is not started) — `design-decisions.md` § "Forward path".
 
-1. **Zig 0.15.2** (LLVM 20, the LLVM of Fil-C 0.686 and 0.687; zilc's Zig): zailc's work on top
-   of zilc's pure-Zig track **until the first nightly** (first written as "until zail is
-   cross-platform", 2026-10-27).
+1. **Zig 0.15.2** (LLVM 20, the LLVM of Fil-C 0.686 and 0.687; zilc's Zig): the Zig of zailc's
+   existing 0.686 code and of the zilc tests zailc translates. Since the clean slate
+   (2026-11-05) **the new implementation is written for the latest Zig from its first line**;
+   0.15.2 is the side its tests are translated FROM. (First written as "develop on 0.15.2 until
+   zail is cross-platform", 2026-10-27; then "until the first nightly".)
 2. **Then the base moves to Zig 0.17.0 (now 0.17.1), with the first nightly** ("the latest version", owner), which bundles **LLVM
    22.1.8** (owner). Needs zailc's own pass to accept LLVM 22 IR, two majors past Fil-C 0.686's
    LLVM 20 (Zig 0.16 already emits LLVM 21 IR that Fil-C 0.686 cannot read). ⚠️ Zig 0.17.0
