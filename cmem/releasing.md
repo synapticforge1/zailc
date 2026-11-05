@@ -39,7 +39,13 @@ this repo concurrently: re-read `git log` before merging into `main`.
 
 ## The version scheme
 
-- **Plain semver, `MAJOR.MINOR.PATCH`, starting at `0.1.0`.** Tags are `vX.Y.Z`.
+- **Plain semver, `MAJOR.MINOR.PATCH`; the first release is `0.0.1`, the MVP** (owner,
+  2026-11-05: "zail's first release is 0.0.1 now. until then we are at nightly until we get to
+  MVP"; first set as `0.1.0`, 2026-10-08). Tags are `vX.Y.Z`. **Before `0.0.1`, builds are
+  nightly.** ⏳ Not done yet: `build.zig.zon` still reads `0.1.0` and must read `0.0.1` before the
+  release gate opens (the version line arms a release); how a nightly is numbered and published
+  is undecided — a SemVer pre-release such as `0.0.1-nightly.YYYYMMDD` published as a GitHub
+  pre-release is one fit, and would need its own workflow and its own answer to the release gate.
 - **The upstreams are NOT in the number.** Fil-C's version and commit and the Zig version are
   recorded in `upstream.md` and printed by `zailc-gen --version` (the Zig that built it; the Fil-C
   release and commit its forwarder tables were imported from).
@@ -86,7 +92,8 @@ gate"); built here 2026-10-27 (owner: "yes add the bump gate").
   with `--dry-run`). **Before 1.0.0** a MINOR may stand in for a MAJOR floor (SemVer `0.y.z`;
   workspace rule 6) only once README's `### ⚠️ Breaking Changes` table has a row for
   `_next release_` or the version; from 1.0.0 it may not. With no tag yet there is nothing to
-  diff: the first release is `v0.1.0` itself.
+  diff: the first release is `v0.0.1` itself (it was `v0.1.0` until 2026-11-05; `bump.ts` reads
+  the version from `build.zig.zon`, which still says `0.1.0` — see the version scheme above).
 - **CI repeats it on the tag**: `publish.yml` runs `surface.ts --release-check <tag>` (previous
   `v*` tag below it → floor → the actual step must meet it) before building anything.
 - **Inverted 2026-10-27** in a scratch clone, 16/16 as expected: unchanged → patch passes; an

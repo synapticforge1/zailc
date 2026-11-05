@@ -2,9 +2,10 @@
 
 **As of 2026-10-08 (late evening): nothing has been released.** `build.zig.zon` reads `0.1.0`,
 there is no tag, and the release gate (`.github/release-gate`) is `closed`, so pushing `main`
-releases nothing (proven on GitHub at the first push, `b331448`). The first release will be `v0.1.0` (what it must contain is under review since 2026-11-05: `design-decisions.md` § Open), and as first defined, only after Fil-C is fully converted to
-Zig and verified against zilc's setups (owner, 2026-10-08), when the owner opens the gate. Rules:
-[releasing.md](releasing.md).
+releases nothing (proven on GitHub at the first push, `b331448`). **The first release will be
+`v0.0.1`, the MVP; nightlies come before it** (owner, 2026-11-05; it was planned as `v0.1.0`
+after a full Fil-C-to-Zig conversion, which is now zilc's track). It ships when the owner opens
+the gate. Rules: [releasing.md](releasing.md).
 
 ## How to use this file
 

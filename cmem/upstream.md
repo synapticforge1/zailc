@@ -38,7 +38,8 @@ in zilc's track. zailc moves its pin when its own next work needs Fil-C's code (
 - **Zig:** not before the owner's condition is met (zailc produces the same as zilc). Zig 0.16 moves
   to LLVM 21 IR, which Fil-C 0.686 cannot read, so a Zig move implies step 3 done or Fil-C on
   LLVM 21 (zilc's `design-decisions.md`, 2026-10-05). 🧭 **The path (owner, 2026-10-27):** stay
-  on 0.15.2 until zail is cross-platform, then move the base to **Zig 0.17.1** (0.17.0 bundled LLVM 22.1.8; 0.17.1, released 2026-11-02, the target since 2026-11-05) (`design-decisions.md`
+  on 0.15.2 until the first nightly (2026-11-05; first "until zail is cross-platform"), which
+  moves the base to **Zig 0.17.1** (0.17.0 bundled LLVM 22.1.8; 0.17.1, released 2026-11-02, the target since 2026-11-05) (`design-decisions.md`
   § "Forward path").
 
 ## What upstream's files look like, for the pieces ported so far
