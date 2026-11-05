@@ -51,8 +51,6 @@ applies: an importer for upstream's lists, an oracle against the release, the tw
 - 🗓️ **Follow-ups of the 2026-11-05 release decision** (`design-decisions.md`, the `0.0.1` row):
   `build.zig.zon` reads `0.1.0` and must read `0.0.1` before the release gate opens; how a
   nightly is numbered and published; what the MVP contains.
-- 🗓️ **A libc function not yet translated:** fall back to Zig's bundled musl compiled through
-  the pass, or fail the link naming it? (`design-decisions.md` § Open; agent: the fallback.)
 - ⚠️ **The first nightly needs a Fil-C pass that reads LLVM 22 IR** (Zig 0.17.1's; Fil-C 0.687's
   pass reads LLVM 20, zilc's Zig pass is not started) — `design-decisions.md` § "Forward path".
 - 🗓️ **Pending owner confirmation:** the 2026-10-27 type and operator decisions (`int`/`float`,
@@ -87,6 +85,7 @@ applies: an importer for upstream's lists, an oracle against the release, the tw
 | 2026-10-27 | The zail language direction (owner): `.zail`, one `string`, `int`/`float` + Zig's numeric set, `/` and `\`, one `zail.json` generating `build.zig`/`build.zig.zon`, packages from URLs and Git | `e03f98e` … `40e3094` | `roadmap.md` § "The zail language", `design-decisions.md` |
 | 2026-10-27 | The Zig version path (owner): 0.15.2 until cross-platform, then 0.17.0 (LLVM 22.1.8, loop vectorizer off); every move waits for ZLS | `7dcba5b` … `1ef2c04` | `roadmap.md` § "The Zig version path", `design-decisions.md` § "Forward path" |
 | 2026-11-05 | Zig target 0.17.0 → 0.17.1 (owner; released 2026-11-02) | `582c84d` | `design-decisions.md` § "Forward path" |
+| 2026-11-05 | `zail-modules`: the libraries programs link (runtime, libc, libc++, dependencies) per project, via `zail init` / `zail add`; compiling needs no libraries, linking does | (the commit recording it) | `design-decisions.md` (the `zail-modules` row), `roadmap.md` |
 | 2026-11-05 | The libc direction (a Zig libc translated from musl function by function, only the functions used; one top, a per-OS bottom), licensing for the clean slate (framework kept; musl's notice via Zig's `lib/libc/musl/COPYRIGHT`; a "Retired" ledger section), and the clean slate's pins (Fil-C 0.687, Zig 0.17.1, zilc `v0.15.2-0.687.1`) | (the commit recording them) | `design-decisions.md`, `licensing.md`, `third_party/LICENSES.md`, `upstream.md`, `roadmap.md` |
 | 2026-11-05 | The clean slate recorded: a new, fully Zig implementation on the latest Zig; zilc as the reference corpus and source of translated tests; parity = same result | `42f7eab` | `design-decisions.md` (the clean-slate row), `roadmap.md` § "The approach", `oracle.md` |
 | 2026-11-05 | The owner's answers recorded: first release `0.0.1` (the MVP), nightlies before it; work order x86-64 → runtime in Zig → TypeScript syntax → Zig 0.17.1 from the first nightly | `79a6225` | `design-decisions.md`, `roadmap.md` § "The order of work" |

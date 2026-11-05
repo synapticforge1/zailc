@@ -63,9 +63,14 @@ beyond it — the latest Zig, other platforms:
   platform, over a per-OS bottom: system calls on Linux/Android, Win32 on Windows, `libSystem`
   on Apple. What to translate next is measured from the undefined libc symbols of what zailc
   builds (zilc's translated tests first); the source is Zig's bundled musl, plus Fil-C's musl
-  adaptations where its user libc differs. Linux x86-64 first. Open: whether a not-yet-translated
-  function falls back to Zig's musl compiled through the pass, or fails the link
-  (`design-decisions.md`, the libc row and § Open).
+  adaptations where its user libc differs. Linux x86-64 first. It reaches programs through the
+  project's `zail-modules` folder (`zail init` / `zail add`, below), which must cover every libc
+  function a project's C code calls — translated, or its musl original compiled through the pass
+  until it is (`design-decisions.md`, the libc and `zail-modules` rows).
+- **Compiling needs no libraries; linking and running do.** zailc compiles with its front ends,
+  the pass, LLVM's code generator and, for C/C++, the headers. The programs it produces link the
+  Fil-C runtime (every program), the libc (C/C++ code, and Zig/zail code that calls C) and
+  libc++ (C++), all compiled by zailc, from `zail-modules`.
 - **Zig language fidelity** (zilc's former P4): how Zig's pointer kinds (slices, many-pointers,
   optionals, `allowzero`, `@ptrCast`, `@intFromPtr`/`@ptrFromInt`) map onto Fil-C's capabilities.
 - **C++ and polish** (zilc's former P5): libc++/libc++abi, exceptions, threads, performance.
@@ -203,6 +208,10 @@ first release.) zailc becomes the compiler for a language, **zail**:
   `remove` / `update` edit it, `zail.lock` pins versions and hashes, and the toolchain generates
   `build.zig` / `build.zig.zon` into `.zail/`. Packages come from URLs and Git repositories, as
   Zig's do, and every dependency is built from source by zailc (`design-decisions.md`).
+- **`zail-modules`, per project** (decided 2026-11-05): the libraries a program links — the Fil-C
+  runtime, the libc, libc++, and every dependency — placed there by `zail init` / `zail add`
+  (the role `node_modules` has for Bun and Deno), built from source by zailc, pinned by
+  `zail.lock`, never committed.
 
 No zail question is open as of 2026-10-27. Steps 2 and 3 above are the foundation: the runtime and the pass are what give
 `.zail` code, like Zig and C, Fil-C's guarantees.
