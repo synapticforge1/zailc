@@ -85,9 +85,9 @@ applies: an importer for upstream's lists, an oracle against the release, the tw
 | 2026-10-27 | The zail language direction (owner): `.zail`, one `string`, `int`/`float` + Zig's numeric set, `/` and `\`, one `zail.json` generating `build.zig`/`build.zig.zon`, packages from URLs and Git | `e03f98e` … `40e3094` | `roadmap.md` § "The zail language", `design-decisions.md` |
 | 2026-10-27 | The Zig version path (owner): 0.15.2 until cross-platform, then 0.17.0 (LLVM 22.1.8, loop vectorizer off); every move waits for ZLS | `7dcba5b` … `1ef2c04` | `roadmap.md` § "The Zig version path", `design-decisions.md` § "Forward path" |
 | 2026-11-05 | Zig target 0.17.0 → 0.17.1 (owner; released 2026-11-02) | `582c84d` | `design-decisions.md` § "Forward path" |
-| 2026-11-05 | The clean slate recorded: a new, fully Zig implementation on the latest Zig; zilc as the reference corpus and source of translated tests; parity = same result | (the commit recording it) | `design-decisions.md` (the clean-slate row), `roadmap.md` § "The approach", `oracle.md` |
-| 2026-11-05 | The owner's answers recorded: first release `0.0.1` (the MVP), nightlies before it; work order x86-64 → runtime in Zig → TypeScript syntax → Zig 0.17.1 from the first nightly | (the commit recording them) | `design-decisions.md`, `roadmap.md` § "The order of work" |
-| 2026-11-05 | The split with zilc recorded (C22–C25): steps 2–3 are zilc's; zailc owns departures (W-10), cross-platform, a Zig runtime, Zig fidelity, C++, newer Zig, zail; first release and next item → owner | (the memory-update commit) | `design-decisions.md` (split row, § Open), `roadmap.md` § "What zailc owns" |
+| 2026-11-05 | The clean slate recorded: a new, fully Zig implementation on the latest Zig; zilc as the reference corpus and source of translated tests; parity = same result | `42f7eab` | `design-decisions.md` (the clean-slate row), `roadmap.md` § "The approach", `oracle.md` |
+| 2026-11-05 | The owner's answers recorded: first release `0.0.1` (the MVP), nightlies before it; work order x86-64 → runtime in Zig → TypeScript syntax → Zig 0.17.1 from the first nightly | `79a6225` | `design-decisions.md`, `roadmap.md` § "The order of work" |
+| 2026-11-05 | The split with zilc recorded (C22–C25): steps 2–3 are zilc's; zailc owns departures (W-10), cross-platform, a Zig runtime, Zig fidelity, C++, newer Zig, zail; first release and next item → owner | `cd17f16` | `design-decisions.md` (split row, § Open), `roadmap.md` § "What zailc owns" |
 
 ## Workspace correspondence (letters addressed to zailc)
 
@@ -101,5 +101,11 @@ look it up in that file's map. Answered 2026-11-05, zilc (the creator) to verify
 **C22** (cross-platform is zailc's, Linux aarch64 included), **C23** (zilc on Fil-C 0.687,
 released `v0.15.2-0.687.1`), **C24** (steps 2–3 moved to zilc; zailc keeps W-10, the zail
 language, newer Zig, cross-platform), **C25** (zilc finished yolo musl's shared half) — all in
-`design-decisions.md` (the split row), `roadmap.md`, `oracle.md`. zailc has created no ledger item
-of its own (checked 2026-11-05: none of the 56 rows is from zailc).
+`design-decisions.md` (the split row), `roadmap.md`, `oracle.md`.
+
+**Opened by zailc (zailc verifies and closes):** **C28** (2026-11-05, to zilc, record-only):
+zailc is a clean slate on the latest Zig and zilc is its reference corpus — zilc's tests,
+examples and recorded results are now a dependency of zailc, so moves, renames or removals should
+be announced. Close it once zilc's answer is in the row and its own memory records it (re-derive:
+`git grep` in `../zilc/cmem/` for the corpus role). Before C28, zailc had opened no item (checked
+2026-11-05: none of 56 rows).
