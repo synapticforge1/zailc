@@ -16,7 +16,7 @@ the full reasoning is zilc's `cmem/licensing.md`, which zailc follows.
 | --- | --- | --- |
 | Fil-C compiler (clang/LLVM + FilPizlonator) | Apache-2.0 WITH LLVM-exception | `fil-c/LLVM-LICENSE.txt` |
 | Fil-C runtime (libpas, filc runtime, generators) | BSD-2-Clause (Apple, Epic Games, Filip Pizlo) | `fil-c/PAS-LICENSE.txt` |
-| musl (Fil-C's usermusl / yolomusl) | MIT | `fil-c/MUSL-LICENSE.txt` |
+| musl (Fil-C's usermusl / yolomusl; and Zig's bundled copy, whose own notice is `lib/libc/musl/COPYRIGHT` in Zig's tree) | MIT (Rich Felker, et al.) | `fil-c/MUSL-LICENSE.txt` |
 | Zig | MIT | `zig/LICENSE` |
 
 ## Component Ledger
@@ -29,3 +29,17 @@ the full reasoning is zilc's `cmem/licensing.md`, which zailc follows.
 | 2026-10-09 | **compiler-rt build recipe**: the builtins' source selection and flags and crtbegin/crtend's command lines as compiler-rt's CMake produces them for Zig's clang (build.ninja, as data), and build_compiler_rt.sh's install layout, expressed in `build.zig` | Fil-C v0.686's compiler-rt (LLVM) | Apache-2.0 WITH LLVM-exception (`fil-c/LLVM-LICENSE.txt`) | `src/runtime/compiler_rt_sources.zig` (imported by `tools/runtime/import-compiler-rt-sources.ts`), `build.zig` `buildCompilerRt` | The sources are compiled from the Fil-C tree given by `-Dfilc-src`; nothing of compiler-rt is copied into zailc. Members define upstream's symbols in upstream's order (`tools/runtime/verify-compiler-rt.ts`), plus W-10's two `_Float16` functions |
 | 2026-10-09 | **yolo musl build recipe**: the object rules of `projects/yolomusl/Makefile` (evaluated over the tree, as data) and the flags musl's `configure` chooses for Zig's clang, plus the `version.h` and `libyolom.a` rules and `build_yolomusl.sh`'s install layout, expressed in `build.zig` | Fil-C v0.686's patched musl 1.2.4 | MIT (musl, Rich Felker et al.; `fil-c/MUSL-LICENSE.txt`) | `src/runtime/yolomusl_sources.zig` (imported by `tools/runtime/import-yolomusl-sources.ts`), `build.zig` `buildYoloMusl`, `src/gen/musl_headers.zig` `installGenerated` | The C and assembly sources are compiled from the Fil-C tree given by `-Dfilc-src`; nothing of musl is copied into zailc. Members define upstream's symbols in upstream's order (`tools/runtime/verify-yolomusl.ts`) |
 | 2026-10-08 | **libpas build recipe**: the `PASSRCS` list of `libpas/common.mk` (as data) and the PASCC / PASCFLAGS / MAINCFLAGS flags of `libpas/Makefile`, plus `yolounwind/Makefile`'s one rule, expressed in `build.zig` | Fil-C v0.686 | BSD-2-Clause (Epic Games, Filip Pizlo) | `src/runtime/libpas_sources.zig` (imported by `tools/runtime/import-libpas-sources.ts`), `build.zig` `buildStockRuntime` | The C sources are compiled from the Fil-C tree given by `-Dfilc-src`; nothing of libpas is copied into zailc. Objects define the same global symbols as upstream's (`tools/runtime/verify-libpas.ts`) |
+
+The rows above describe the 0.686 code. zailc is now a clean-slate implementation in the latest
+Zig (`cmem/design-decisions.md`, 2026-11-05): new rows are added as its translated pieces arrive
+(the pass, the runtime, each family of libc functions), each naming the Fil-C release or Zig
+version it was read from.
+
+## Retired
+
+Rows whose files have left the tree, each with the commit that removed them. The files keep
+their upstream notices in git history.
+
+| retired | row (from above) | removed by |
+| --- | --- | --- |
+| | *(none yet: the 0.686 code is still in the tree)* | |

@@ -58,6 +58,14 @@ beyond it — the latest Zig, other platforms:
   the end of this file.
 - **A runtime written in Zig** (zilc's former P3): replace Fil-C's C runtime piece by piece behind
   the ABI the pass calls, each piece checked against Fil-C's under the same gate.
+- **A libc in Zig, translated from musl function by function — only the functions used**
+  (owner, 2026-11-05). One checked top (the C API, C ABI, through zailc's pass) for every
+  platform, over a per-OS bottom: system calls on Linux/Android, Win32 on Windows, `libSystem`
+  on Apple. What to translate next is measured from the undefined libc symbols of what zailc
+  builds (zilc's translated tests first); the source is Zig's bundled musl, plus Fil-C's musl
+  adaptations where its user libc differs. Linux x86-64 first. Open: whether a not-yet-translated
+  function falls back to Zig's musl compiled through the pass, or fails the link
+  (`design-decisions.md`, the libc row and § Open).
 - **Zig language fidelity** (zilc's former P4): how Zig's pointer kinds (slices, many-pointers,
   optionals, `allowzero`, `@ptrCast`, `@intFromPtr`/`@ptrFromInt`) map onto Fil-C's capabilities.
 - **C++ and polish** (zilc's former P5): libc++/libc++abi, exceptions, threads, performance.
