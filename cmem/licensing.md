@@ -15,3 +15,20 @@ from the Ruby table) is treated the same as a port.
 
 **Binary distributions.** A program linking a runtime built by zailc contains BSD-2 and MIT code,
 so its documentation must reproduce those notices; `NOTICE` says so, as zilc's does.
+
+## The clean slate (owner, 2026-11-05)
+
+The framework above stays: zailc is a new implementation, but it TRANSLATES Fil-C, and licences
+follow translation, not just copying (`design-decisions.md`, the licensing row).
+
+| component | in the clean slate | the notice |
+| --- | --- | --- |
+| Fil-C's pass (`FilPizlonator.cpp`) | zailc's own pass in Zig translates it | Apache-2.0 WITH LLVM-exception, Fil-C's `LLVM-LICENSE.txt` |
+| Fil-C's runtime (libpas, the filc runtime) | the runtime in Zig ports it | BSD-2-Clause (Apple, Epic Games, Filip Pizlo) |
+| musl | the Zig libc translates it function by function, only the functions used (`design-decisions.md`, the libc row) | MIT, **musl's own notice** — Zig's bundled copy carries it in `lib/libc/musl/COPYRIGHT` ("Copyright © 2005-2020 Rich Felker, et al."), separate from Zig's `LICENSE` |
+| Fil-C's adaptations of musl | translated where Fil-C's user libc differs from stock musl | Fil-C's notice for those changes |
+| Zig | only code copied or adapted from Zig (using Zig as the compiler creates no obligation) | MIT, "Copyright (c) Zig contributors" |
+| zilc | tests, examples and notes read and translated (same author) | attribution; a test zilc took from elsewhere keeps its origin's licence |
+
+The old ledger rows (the 0.686 code) move to "Retired" in `third_party/LICENSES.md` when their
+files leave the tree, with the removing commit; the files keep their notices in git history.
