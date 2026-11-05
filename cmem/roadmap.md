@@ -29,7 +29,13 @@ from it or goes beyond Linux x86_64:
 - **The zail language**: the last section of this file.
 
 zilc's `roadmap.md` P3–P6, `filc-abi.md` and `tools/p3/` probes are the record inherited
-(read there; nothing is copied).
+(read there; nothing is copied). **Start from zilc's `Fil-C.md` and `Zig.md`** (owner,
+2026-10-27: "our notes on how we got to base versus zig pure parity for the zail project to build
+on"): the base and its workarounds, then the pure-Zig route piece by piece (recipe, Zig build,
+oracle, allowed differences, status). For linking yolo musl's shared half, zilc's W-11 records
+three facts (`zig ld.lld` because `zig cc` refuses `--exclude-libs`/`--dynamic-list`;
+`--exclude-libs=libyolort.a` when linking it as an archive; LLD's extra `PHDR` and GCC's
+`GNU_PROPERTY` allowed by name).
 
 ## Step 2 — `zig build` compiles Fil-C's runtime from source (🔁 moved to zilc, 2026-10-27)
 
