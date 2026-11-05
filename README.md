@@ -5,13 +5,13 @@ with AI-assisted development. Zig's tool chain and language syntax backbone, wit
 fixes and security hardening. Open book editing of the upstream tools so the upstream projects
 can see what was fixed and the reasons why.
 
-> **Status (2026-10-27): step 2 in progress, nothing released yet.** zailc grows out of
+> **Status (2026-11-05): nothing released yet.** zailc grows out of
 > [zilc](https://github.com/synapticforge1/zilc), which compiles Zig and C through Fil-C's pass
-> and runtime and stays the stable, upstream-faithful reference and zailc's test oracle. zailc's
-> first release is a toolchain whose user installs ONLY Zig and runs `zig build`. It stays on
-> **Zig 0.15.2** (LLVM 20, the LLVM Fil-C 0.686 uses) until it is proven to produce the same
-> output as zilc and works across platforms; the base then moves to **Zig 0.17.1**, once ZLS
-> supports it.
+> and runtime, is zailc's test oracle, and since 2026-10-27 also carries the faithful build of
+> Fil-C in Zig (the runtime from source, then the pass), Linux x86_64 only. zailc builds on that
+> result: its own fixes to upstream, the other platforms (Linux aarch64, macOS, Windows, …),
+> newer Zig, and the zail language. It stays on **Zig 0.15.2** (LLVM 20, Fil-C's LLVM) until it
+> works across platforms; the base then moves to **Zig 0.17.1**, once ZLS supports it.
 >
 > **Beyond that:** zailc becomes the compiler for **zail**, a language with TypeScript- and
 > Zig-like syntax (`.zail` files) that builds projects mixing C, C++, Zig and zail with Fil-C's
@@ -19,8 +19,9 @@ can see what was fixed and the reasons why.
 
 ## What exists today
 
-Step 2 of the brief (`cmem/scope.md`): `zig build` compiles Fil-C's runtime from upstream's
-sources, starting with the pieces built by an ordinary C compiler. Fil-C's runtime build needs
+Step 2 of the brief (`cmem/scope.md`), for Fil-C 0.686: `zig build` compiles Fil-C's runtime
+from upstream's sources, starting with the pieces built by an ordinary C compiler. This work
+continues in zilc since 2026-10-27, on Fil-C 0.687; what is listed here is zailc's 0.686 state. Fil-C's runtime build needs
 two Ruby generators; a user's `zig build` may rely on Zig alone, so they become Zig.
 
 - `src/gen/`: **the forwarder generator**, a port of Fil-C's

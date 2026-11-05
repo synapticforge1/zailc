@@ -1,5 +1,9 @@
 # Scope: a Zig version of Fil-C, on Zig 0.15.2 (2026-10-05)
 
+> 🔁 **2026-10-27 (owner): steps 2 and 3 below are now zilc's** (its pure-Zig track), and the
+> platform work in the last section is zailc's — `design-decisions.md`, the split row. The brief
+> is kept as written: its sizing and risks still describe that work wherever it is done.
+>
 > **zailc's starting brief.** Copied verbatim on 2026-10-08 from zilc's `cmem/zig-filc-scope.md`
 > (zilc commit `7331157`), where it was written as the brief for this project. File references
 > (`design-decisions.md`, `platforms.md`) are zilc's. **One correction since it was written:** the

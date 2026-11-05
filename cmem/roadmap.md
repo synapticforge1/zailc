@@ -1,8 +1,37 @@
 # Roadmap
 
 > Started 2026-10-08. Step 1 is zilc. Sizes and evidence: `scope.md`.
+>
+> 🔁 **2026-10-27 (owner; recorded 2026-11-05): steps 2 and 3 MOVED TO zilc** as its "pure-Zig
+> track" (Z1, Z2 in `../zilc/cmem/roadmap.md`), faithful to each Fil-C release, Linux x86_64. The
+> step 2 and step 3 sections below are zailc's record of its 0.686 work, closed; zilc continues
+> them. What zailc owns now: the next section. (`design-decisions.md`, the split row.)
 
-## Step 2 — `zig build` compiles Fil-C's runtime from source
+## What zailc owns (owner, 2026-10-27)
+
+zailc builds on zilc's pure-Zig result ("the corpus of truth") and keeps everything that departs
+from it or goes beyond Linux x86_64:
+
+- **Departures from upstream**, each a recorded decision with its why. Today exactly one:
+  **W-10**, `_Float16` converted correctly (`workarounds.md`).
+- **Cross-platform, all of it — Linux aarch64 included** (zilc stays Linux x86_64). zilc's
+  `platforms.md` and its P6 are the measured record to start from: Linux aarch64's four small gaps;
+  Fil-C's cosmo mode for macOS and x86_64 Windows (`statx` missing from the cosmo runtime, real
+  Windows unverified); aarch64 Windows, iOS and Android last. Details: the platform section at
+  the end of this file.
+- **A runtime written in Zig** (zilc's former P3): replace Fil-C's C runtime piece by piece behind
+  the ABI the pass calls, each piece checked against Fil-C's under the same gate.
+- **Zig language fidelity** (zilc's former P4): how Zig's pointer kinds (slices, many-pointers,
+  optionals, `allowzero`, `@ptrCast`, `@intFromPtr`/`@ptrFromInt`) map onto Fil-C's capabilities.
+- **C++ and polish** (zilc's former P5): libc++/libc++abi, exceptions, threads, performance.
+- **Newer Zig** past zilc's (zilc stays on the Zig whose LLVM matches Fil-C's): the version path
+  below.
+- **The zail language**: the last section of this file.
+
+zilc's `roadmap.md` P3–P6, `filc-abi.md` and `tools/p3/` probes are the record inherited
+(read there; nothing is copied).
+
+## Step 2 — `zig build` compiles Fil-C's runtime from source (🔁 moved to zilc, 2026-10-27)
 
 Everything here is checked against the oracle (`oracle.md`): same bytes where a file is generated,
 same objects or same behaviour where code is compiled.
@@ -42,7 +71,7 @@ same objects or same behaviour where code is compiled.
       GCC-vs-clang residue is W-8, ratcheted. In the two-runtime oracle: `link-run.ts` 12/12 and
       zilc's corpus (`testing.md`) with our `libyoloc.a`, `libyolom.a`, `rcrt1.o`, `crti.o`,
       `crtn.o`.
-- [ ] **yolo musl's shared half**: `libyoloc.so` (LOBJS + LDSO_OBJS `dlstart`/`dynlink`, linked
+- [→ zilc, ✅ there 2026-10-27 on 0.687, 1,653 exports equal] **yolo musl's shared half**: `libyoloc.so` (LOBJS + LDSO_OBJS `dlstart`/`dynlink`, linked
       `-nostdlib -shared -Wl,-e,_dlstart` with LDFLAGS_AUTO and `LIBCC` = libyolort) and
       `ld-fil1-x86_64.so` (a link to it). Needs libyolort (next item) for `LIBCC`. Oracle: the
       tarball's `libyoloc.so` (dynamic symbols) and a dynamically linked Fil-C program.
@@ -52,29 +81,33 @@ same objects or same behaviour where code is compiled.
       `verify-compiler-rt.ts` (W-8's GCC-vs-clang residue ratcheted). In the overlay: `link-run.ts`
       13/13, and zilc's corpus (`testing.md`). Fixed on the way: Fil-C's `_Float16` defect (W-10, a
       recorded departure).
-- [ ] **The three Fil-C-compiled pieces** (`filc/src` ~2.5k lines, user libc ~102k, libc++ /
+- [→ zilc Z1] **The three Fil-C-compiled pieces** (`filc/src` ~2.5k lines, user libc ~102k, libc++ /
       libc++abi): through Fil-C's clang inside `zig build` as a development bridge only; they
       ship compiled by zailc's own pass (step 3). Nothing upstream-built ships (owner, 2026-10-08,
       `design-decisions.md` 🎯).
-- [ ] **A Fil-C program linked entirely from `zig build`'s outputs** runs, traps out-of-bounds,
+- [→ zilc Z1] **A Fil-C program linked entirely from `zig build`'s outputs** runs, traps out-of-bounds,
       and zilc's corpus passes against it as it does against the prebuilt runtime.
-- [ ] **Fil-C's own test suite** against the `zig build` runtime (zilc's `run-filc-tests.ts`).
+- [→ zilc Z1] **Fil-C's own test suite** against the `zig build` runtime (zilc's `run-filc-tests.ts`).
 
-## Step 3 — the pass in Zig
+## Step 3 — the pass in Zig (🔁 moved to zilc as Z2, 2026-10-27; never started here)
 
-- [ ] An LLVM IR text model in Zig (parser, use lists, RAUW, retyping, printer, DataLayout),
+All four items below are zilc's now. zailc still needs the result for the Zig move (the
+"Forward path" in `design-decisions.md`): a pass that accepts the newer Zig's LLVM IR.
+
+- [→ zilc Z2] An LLVM IR text model in Zig (parser, use lists, RAUW, retyping, printer, DataLayout),
       covering what Zig 0.15.2 and clang 20 emit, debug metadata included (~8–12k lines).
-- [ ] The pass itself (`FilPizlonator.cpp`, 17.5k lines → ~15–20k lines of Zig), inline-asm
+- [→ zilc Z2] The pass itself (`FilPizlonator.cpp`, 17.5k lines → ~15–20k lines of Zig), inline-asm
       allowlists and AVX-512 tables deferred (reject instead).
-- [ ] The analyses the pass needs (DominatorTree, mem2reg, splitting, LoopInfo) plus KillUB and
+- [→ zilc Z2] The analyses the pass needs (DominatorTree, mem2reg, splitting, LoopInfo) plus KillUB and
       the MANDATORY DeleteRedundantPollchecks.
-- [ ] Oracle: the same Zig module through zilc (Fil-C's pass) and through zailc's pass, compared
+- [→ zilc Z2] Oracle: the same Zig module through zilc (Fil-C's pass) and through zailc's pass, compared
       as IR after the pass and as program behaviour.
 
 ## The Zig version path (owner, 2026-10-27)
 
-1. **Zig 0.15.2** (LLVM 20, Fil-C 0.686's LLVM): steps 2 and 3, the first release, and the zail
-   language's development, **until zail is cross-platform** (the platform list at the end of
+1. **Zig 0.15.2** (LLVM 20, the LLVM of Fil-C 0.686 and 0.687; zilc's Zig): zailc's work on top
+   of zilc's pure-Zig track — departures, the cross-platform work, the zail language — **until
+   zail is cross-platform** (the platform list at the end of
    this file).
 2. **Then the base moves to Zig 0.17.0** ("the latest version", owner), which bundles **LLVM
    22.1.8** (owner). Needs zailc's own pass to accept LLVM 22 IR, two majors past Fil-C 0.686's

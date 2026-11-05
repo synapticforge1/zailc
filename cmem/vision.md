@@ -20,9 +20,14 @@ binaryang replaced wabt and binaryen:
 
 | step | what | state |
 | --- | --- | --- |
-| 1 | Zig IR → Fil-C's clang (pass + codegen) → Fil-C's prebuilt runtime | done in zilc (`0.15.2-0.686.1`) |
-| 2 | `zig build` compiles Fil-C's runtime from source | **started 2026-10-08** (the generators first) |
-| 3 | the pass in Zig, compiled by Zig's own LLVM | scoped (`scope.md`) |
+| 1 | Zig IR → Fil-C's clang (pass + codegen) → Fil-C's prebuilt runtime | done in zilc (`0.15.2-0.686.1`; now `0.15.2-0.687.1`) |
+| 2 | `zig build` compiles Fil-C's runtime from source | started in zailc 2026-10-08 (0.686); **🔁 zilc's since 2026-10-27** (its Z1, on 0.687) |
+| 3 | the pass in Zig, compiled by Zig's own LLVM | scoped here (`scope.md`); **🔁 zilc's since 2026-10-27** (its Z2) |
+
+🔁 **The split (owner, 2026-10-27):** zilc builds the faithful Fil-C-in-Zig ("the corpus of
+truth"); zailc builds on it with what departs from it or goes beyond it — its departures, the
+platforms beyond Linux x86_64, a runtime written in Zig, Zig language fidelity, C++, newer Zig,
+and the zail language (`roadmap.md` § "What zailc owns").
 
 **After the first release (owner, 2026-10-27): zailc becomes the compiler for zail**, a language
 with syntax similar to TypeScript and Zig (`.zail` files), compiling projects that mix C, C++,
@@ -34,10 +39,10 @@ questions they open: `roadmap.md` § "Beyond the first release".
 
 | | zilc | zailc |
 | --- | --- | --- |
-| purpose | the stable, upstream-faithful reference; follows Zig and Fil-C releases | the translation into Zig; fixes and clean-ups where upstream left them |
+| purpose | the stable, upstream-faithful reference; follows Fil-C releases and the Zig whose LLVM matches; Linux x86_64 only; since 2026-10-27 also the faithful pure-Zig build | builds on zilc's result: fixes and clean-ups where upstream left them, other platforms, newer Zig, the zail language |
 | version line | `<Zig>-<Fil-C>.<release>`, moves with upstream | **Zig 0.15.2 until proven equal to zilc and cross-platform; then a Zig 0.17.1 base** (owner, 2026-10-27; 0.17.0 → 0.17.1 on 2026-11-05) |
 | role in testing | the oracle: its outputs are what zailc must reproduce | the subject |
-| the pass | never ported; called externally | ported to Zig (step 3) |
+| the pass | ported to Zig (its Z2, since 2026-10-27) | uses zilc's Zig pass; must take it to newer Zig's LLVM |
 | development | | AI-assisted, with every decision and its why recorded in `cmem/` |
 
 "Zag where they zig" is a licence to depart from upstream's design where it is a mess, not from

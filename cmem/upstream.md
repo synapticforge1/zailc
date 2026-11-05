@@ -4,7 +4,12 @@
 | --- | --- | --- | --- |
 | **Fil-C** | **v0.686**, commit `163fae598eaf249b74065b0156f3a7e7ba8c0e5a` | the release zilc `0.15.2-0.686.1` is built on; LLVM 20.1.8 | `tools/lib/tool.ts` `FILC_VERSION` / `FILC_SHA`; trees listed in `oracle.md` |
 | **Zig** | **0.15.2** | bundles LLVM 20.1.2, the same major as Fil-C 0.686, so IR is exchangeable; owner: pinned until zailc is proven equal to zilc | `build.zig.zon` `minimum_zig_version`; binary in `oracle.md` |
-| **zilc** | `main` at or after `ba4d72b` (2026-10-08) | the reference; its `cmem/` holds the history zailc's brief came from | sibling folder `../zilc` |
+| **zilc** | `main` at or after `ba4d72b` (2026-10-08, a pre-purge id: zilc rewrote its history 2026-10-27, map `../zilc/cmem/history-map-2026-10-27.md`) | the reference; its `cmem/` holds the history zailc's brief came from; since 2026-10-27 also the faithful pure-Zig build zailc builds on | sibling folder `../zilc` |
+
+**Fil-C 0.687** (released 2026-10-23, tag `v0.687` = `2db72c6`, the same LLVM 20.1.8) is zilc's
+release since 2026-10-27 (`v0.15.2-0.687.1`; workspace C23). zailc's pin above stays 0.686: its
+step-2 code and results are the 0.686 record, and new runtime work against Fil-C releases happens
+in zilc's track. zailc moves its pin when its own next work needs Fil-C's code (owner's call).
 
 ## Moving the pins
 

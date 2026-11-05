@@ -5,36 +5,44 @@ two layers"). Only open items stay open; done work is one line with its merge co
 file that now holds the substance. The full dated narrative this file replaces (the INDEX's
 ⏸️ PAUSED section, 2026-10-05 → 2026-10-22) is `git show f194fc9:cmem/INDEX.md`.
 
-## Status (2026-10-27)
+## Status (2026-11-05)
 
-- **Step 2 paused since 2026-10-09 (night)** (owner: "update the project memory files and pause
-  here for today"); no runtime work since. Since then: the Bun port (`2e0e650`), the org move
-  (`f194fc9`), and on 2026-10-27 the workspace-floor conformance (`dacd426`), the compatibility
-  gate (`1455c16`), the history purge (force-pushed), and the **zail language direction and the
-  Zig version path** (decisions only, nothing built: `roadmap.md` §§ "The Zig version path",
-  "Beyond the first release"; `design-decisions.md`).
+- 🔁 **Steps 2 and 3 are zilc's since 2026-10-27** (owner; `design-decisions.md`, the split row):
+  zilc's pure-Zig track continues them on Fil-C 0.687 and has already done yolo musl's shared half,
+  zailc's old resume point. zailc's step-2 code and records here are the 0.686 history. **zailc
+  owns** its departures (W-10), cross-platform (Linux aarch64 included), a runtime in Zig, Zig
+  language fidelity, C++ and polish, the newer-Zig path (0.17.1) and the zail language
+  (`roadmap.md` § "What zailc owns"). No zailc work item is active; the next one is the owner's
+  call (below).
+- Since the 2026-10-09 pause: the Bun port (`2e0e650`), the org move (`f194fc9`); on 2026-10-27
+  the workspace-floor conformance (`dacd426`), the compatibility gate (`1455c16`), the history
+  purge (`b325c49`), the zail language direction and the Zig version path (decisions only); on
+  2026-11-05 the Zig target moved to 0.17.1 and the split with zilc was recorded.
 - **Release:** version `0.1.0` in `build.zig.zon`; nothing released, no tag. 🚦 The release gate
   (`.github/release-gate`) is `closed`: `main` takes finished branches and is pushed, CI runs,
   auto-tag releases nothing. Opening it is the owner's call (`releasing.md`).
-- **Git (2026-10-27):** `main` pushed to `origin/main` with this file's commit; merged branches
-  are kept locally (owner, 2026-10-08) and only `main`, `step2/stock-runtime` and
+- **Git (2026-11-05):** `main` last pushed 2026-10-27 (`258f0d2`, CI and auto-tag green);
+  later commits are local until the owner says push. Merged branches are kept locally (owner, 2026-10-08) and only `main`, `step2/stock-runtime` and
   `docs/state-2026-10-08` exist on `origin`. Commit ids quoted before 2026-10-27 are pre-purge:
   `history-purge-2026-10-27.md`. Check rather than trust this line: `git log --oneline --first-parent
   origin/main..main`, `git branch -r`, `git tag`. Several sessions may commit here: re-read
   `git log` before merging into `main`.
 - **Repository:** `github.com/synapticforge1/zailc` since 2026-10-22 (`origin` uses it).
 
-## ▶️ Resume here: step 2, yolo musl's shared half
+## ▶️ Resume here: 🗓️ the owner picks zailc's next work item
 
-`libyoloc.so` from the `.lo` objects + `ldso/dlstart`, `ldso/dynlink`, linked `-shared
--Wl,-e,_dlstart` with LDFLAGS_AUTO and libyolort as `LIBCC`; `ld-fil1-x86_64.so` a link to it.
-Then the three Fil-C-compiled pieces (Fil-C's clang inside `zig build`, a development bridge
-only), then step 3, the pass (`roadmap.md`). Same method each time: an importer for upstream's
-lists, a `verify-*.ts` symbol oracle against the release tarball, then into the overlay with
-`link-run.ts` (about 2 min) and `corpus-run.ts` (about 20 min, in the background).
+The old resume point (yolo musl's shared half) was done in zilc on 2026-10-27 (C25). Candidates,
+from what zailc owns (`design-decisions.md` § Open): **Linux aarch64** (zilc's `platforms.md`
+lists four small gaps); **a runtime written in Zig** (zilc's former P3); **the zail language's
+grammar**; preparing **the Zig 0.17.1 move** (once ZLS supports it). Also open there: what zailc's
+first release is now. The method that served step 2 still applies to whichever comes next: an
+importer for upstream's lists, an oracle against the release, the two-runtime overlay
+(`link-run.ts`, `corpus-run.ts`).
 
 ## Open
 
+- 🗓️ **zailc's first release, redefined** and **its next work item** — owner calls
+  (`design-decisions.md` § Open).
 - **W-7's exact line** in `FilPizlonator.cpp` (surmised: `scheduleChecks`; `workarounds.md` W-7).
   Not blocking.
 - 🗓️ **GitHub still serves the pre-purge commits by hash** until its own garbage collection; a
@@ -64,6 +72,8 @@ lists, a `verify-*.ts` symbol oracle against the release tarball, then into the 
 | 2026-10-27 | History purged of drive paths (H19): 67 commits rewritten, force-pushed with lease | `b325c49` | `history-purge-2026-10-27.md` (the old → new map) |
 | 2026-10-27 | The zail language direction (owner): `.zail`, one `string`, `int`/`float` + Zig's numeric set, `/` and `\`, one `zail.json` generating `build.zig`/`build.zig.zon`, packages from URLs and Git | `e03f98e` … `40e3094` | `roadmap.md` § "Beyond the first release", `design-decisions.md` |
 | 2026-10-27 | The Zig version path (owner): 0.15.2 until cross-platform, then 0.17.0 (LLVM 22.1.8, loop vectorizer off); every move waits for ZLS | `7dcba5b` … `1ef2c04` | `roadmap.md` § "The Zig version path", `design-decisions.md` § "Forward path" |
+| 2026-11-05 | Zig target 0.17.0 → 0.17.1 (owner; released 2026-11-02) | `582c84d` | `design-decisions.md` § "Forward path" |
+| 2026-11-05 | The split with zilc recorded (C22–C25): steps 2–3 are zilc's; zailc owns departures (W-10), cross-platform, a Zig runtime, Zig fidelity, C++, newer Zig, zail; first release and next item → owner | (the memory-update commit) | `design-decisions.md` (split row, § Open), `roadmap.md` § "What zailc owns" |
 
 ## Workspace correspondence (letters addressed to zailc)
 
@@ -73,4 +83,9 @@ verify and close: **H26** (all of zailc's items), **H22** (path test), **H16** (
 **H28** (record-only), **H15** (already Bun; recorded), **H27** (canonical stamp; zailc's one
 old-folder hit was inside a drive path, now gone), **H19** (purged 2026-10-27,
 `history-purge-2026-10-27.md`). Every zailc commit id quoted before 2026-10-27 is a PRE-purge id:
-look it up in that file's map.
+look it up in that file's map. Answered 2026-11-05, zilc (the creator) to verify and close:
+**C22** (cross-platform is zailc's, Linux aarch64 included), **C23** (zilc on Fil-C 0.687,
+released `v0.15.2-0.687.1`), **C24** (steps 2–3 moved to zilc; zailc keeps W-10, the zail
+language, newer Zig, cross-platform), **C25** (zilc finished yolo musl's shared half) — all in
+`design-decisions.md` (the split row), `roadmap.md`, `oracle.md`. zailc has created no ledger item
+of its own (checked 2026-11-05: none of the 56 rows is from zailc).

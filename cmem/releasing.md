@@ -20,7 +20,9 @@ and why the version bump is a separate, deliberate commit.
 
 **🚦 Behind a release gate (owner, 2026-10-08: "I would prefer the guard so we keep main up to date with finished branches and releases when they are ready").** `.github/release-gate` reads
 `closed` until the first release is due: Fil-C fully converted to Zig and verified against zilc's
-setups, so the user installs Zig and only Zig (`design-decisions.md` 🎯). While it is closed,
+setups, so the user installs Zig and only Zig (`design-decisions.md` 🎯; 🔁 under review since
+2026-11-05, because that conversion moved to zilc — the redefinition is an open owner question in
+`design-decisions.md` § Open). While it is closed,
 **`main` is pushed as usual** and takes every finished branch; CI runs on it; auto-tag stops with
 a notice and releases nothing; `publish.yml` refuses even a hand-pushed `v*` tag. **Opening the
 gate is the owner's decision**, made as its own commit (`closed` → `open`) on a branch, merged

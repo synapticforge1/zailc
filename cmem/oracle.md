@@ -5,6 +5,14 @@ Fil-C's own pass and runtime (zilc's `cmem/testing.md`: its corpus has 0 unexpla
 differences from native Zig, and Fil-C's 7,003 tests pass through its patched clang exactly as
 through stock).
 
+🔁 **2026-11-05:** zilc moved to Fil-C **0.687** and released `v0.15.2-0.687.1` on 2026-10-27
+(workspace C23: Fil-C's suite 0 differences on 7,269 tests, gate 8/8, corpus 78/78 ×4); its oracle
+trees are now `~/zilc-work/tools/filc-0.687-linux-x86_64` (stock) and `filc-0.687-zilc`
+(patched), with 0.686's still installed. Everything below and every result in `testing.md` is
+zailc's **0.686** record; a comparison against zilc today is against 0.687. Since steps 2–3 moved
+to zilc (C24), the step-2 rows below describe how zailc checked its own 0.686 work; zilc's
+`testing.md` holds the current checks for that track.
+
 ## What is compared, per kind of piece
 
 | piece | the oracle's output | the comparison |
