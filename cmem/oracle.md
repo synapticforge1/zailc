@@ -13,6 +13,19 @@ zailc's **0.686** record; a comparison against zilc today is against 0.687. Sinc
 to zilc (C24), the step-2 rows below describe how zailc checked its own 0.686 work; zilc's
 `testing.md` holds the current checks for that track.
 
+🧱 **From the clean slate on (owner, 2026-11-05): how zailc uses zilc as its oracle.** zailc is a
+new implementation on the latest Zig, so the comparison is across Zig versions and is of
+RESULTS, never bytes:
+
+| what zailc takes from zilc | how it is used | the comparison |
+| --- | --- | --- |
+| zilc's test programs and examples (`tests/basics`, the gate's cases, its examples), Zig 0.15.2 | translated into the latest Zig (0.17.1): a port, since the standard library and build API changed | the translation, built by zailc, gives zilc's result: same output (one stream, addresses and pids normalised), same exit code, same safety trap at the same source line |
+| zilc's recorded results (gate, corpus, Fil-C's suite, `compare-chains.ts`) | the expected answers | a translation counts only once it matches; a difference is classified (a translation slip, a zailc defect, or a recorded departure such as W-10) before it is accepted |
+| each new zilc release (a new Fil-C) | new tests and results to translate | the same, again |
+
+Byte-level comparisons (the step-2 rows below) remain how zailc checked its own 0.686 work; they
+do not apply to the clean-slate implementation.
+
 ## What is compared, per kind of piece
 
 | piece | the oracle's output | the comparison |

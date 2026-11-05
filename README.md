@@ -9,11 +9,12 @@ can see what was fixed and the reasons why.
 > is the MVP.** zailc grows out of
 > [zilc](https://github.com/synapticforge1/zilc), which compiles Zig and C through Fil-C's pass
 > and runtime, is zailc's test oracle, and since 2026-10-27 also carries the faithful build of
-> Fil-C in Zig (the runtime from source, then the pass), Linux x86_64 only. zailc builds on that
-> result: its own fixes to upstream, the other platforms (Linux aarch64, macOS, Windows, …),
-> newer Zig, and the zail language. The x86-64 (Linux) version comes first, with a runtime
-> written in Zig. Development is on **Zig 0.15.2** (LLVM 20, Fil-C's LLVM) until the first
-> nightly, which moves to **Zig 0.17.1** (once ZLS supports it).
+> Fil-C in Zig (the runtime from source, then the pass), Linux x86_64 only. **zailc is a
+> clean-slate implementation, written entirely in Zig on the latest Zig**, that uses zilc as its
+> reference corpus: zilc's tests and examples, translated into the latest Zig, must give zilc's
+> results. On top it adds its own fixes to upstream, the other platforms (Linux aarch64, macOS,
+> Windows, …) and the zail language. The x86-64 (Linux) version comes first, with a runtime
+> written in Zig; the first nightly is on **Zig 0.17.1** (once ZLS supports it).
 >
 > **zail:** zailc becomes the compiler for **zail**, a language with TypeScript's syntax (`.zail`
 > files) that builds projects mixing C, C++, Zig and zail with Fil-C's guarantees, described by
