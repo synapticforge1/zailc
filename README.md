@@ -10,7 +10,7 @@ can see what was fixed and the reasons why.
 > and runtime and stays the stable, upstream-faithful reference and zailc's test oracle. zailc's
 > first release is a toolchain whose user installs ONLY Zig and runs `zig build`. It stays on
 > **Zig 0.15.2** (LLVM 20, the LLVM Fil-C 0.686 uses) until it is proven to produce the same
-> output as zilc and works across platforms; the base then moves to **Zig 0.17.0**, once ZLS
+> output as zilc and works across platforms; the base then moves to **Zig 0.17.1**, once ZLS
 > supports it.
 >
 > **Beyond that:** zailc becomes the compiler for **zail**, a language with TypeScript- and
