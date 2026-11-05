@@ -38,7 +38,8 @@ file that now holds the substance. The full dated narrative this file replaces (
 
 **The stages** (`roadmap.md` § "The development stages"), each done when its examples give
 zilc's results: **(1)** build the zailc compiler (Linux x86-64, Zig 0.17.1); **(2)** C; **(3)**
-C++; **(4)** Zig; **(5)** then TypeScript / zail. The order of work around them: x86-64 first, a
+C++; **(4)** Zig; **(5)** then TypeScript / zail; **(6)** Go, through TinyGo, Gollvm or LLGo
+(choice open). The order of work around them: x86-64 first, a
 runtime in Zig as the stages need it, TypeScript's syntax for zail, Zig 0.17.1 from the first
 nightly. Releases: nightlies until the MVP, the first release `0.0.1`.
 
@@ -87,6 +88,7 @@ still applies: an oracle per piece, then whole programs compared against zilc's 
 | 2026-10-27 | The zail language direction (owner): `.zail`, one `string`, `int`/`float` + Zig's numeric set, `/` and `\`, one `zail.json` generating `build.zig`/`build.zig.zon`, packages from URLs and Git | `e03f98e` … `40e3094` | `roadmap.md` § "The zail language", `design-decisions.md` |
 | 2026-10-27 | The Zig version path (owner): 0.15.2 until cross-platform, then 0.17.0 (LLVM 22.1.8, loop vectorizer off); every move waits for ZLS | `7dcba5b` … `1ef2c04` | `roadmap.md` § "The Zig version path", `design-decisions.md` § "Forward path" |
 | 2026-11-05 | Zig target 0.17.0 → 0.17.1 (owner; released 2026-11-02) | `582c84d` | `design-decisions.md` § "Forward path" |
+| 2026-11-05 | Stage 6 added: Go via TinyGo, Gollvm or LLGo (choice open), assessed | (the commit recording it) | `roadmap.md` § "The development stages", `design-decisions.md` |
 | 2026-11-05 | The development stages: compiler → C → C++ → Zig → TypeScript/zail, each matching zilc's results | (the commit recording them) | `design-decisions.md`, `roadmap.md` § "The development stages" |
 | 2026-11-05 | `zail-modules`: the libraries programs link (runtime, libc, libc++, dependencies) per project, via `zail init` / `zail add`; compiling needs no libraries, linking does | (the commit recording it) | `design-decisions.md` (the `zail-modules` row), `roadmap.md` |
 | 2026-11-05 | The libc direction (a Zig libc translated from musl function by function, only the functions used; one top, a per-OS bottom), licensing for the clean slate (framework kept; musl's notice via Zig's `lib/libc/musl/COPYRIGHT`; a "Retired" ledger section), and the clean slate's pins (Fil-C 0.687, Zig 0.17.1, zilc `v0.15.2-0.687.1`) | (the commit recording them) | `design-decisions.md`, `licensing.md`, `third_party/LICENSES.md`, `upstream.md`, `roadmap.md` |
