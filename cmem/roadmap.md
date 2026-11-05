@@ -83,6 +83,9 @@ same objects or same behaviour where code is compiled.
    llvm/llvm-project#186922; Zig's release notes say 0.18.0 and LLVM 23 restore it): slower
    loop-heavy code, not less safe; speed comparisons across the move must name the Zig version.
    0.17.0 stays the plan (owner: "since it just released"); 0.18.0 is not awaited.
+   **Update 2026-11-05: the target is Zig 0.17.1** (owner; released 2026-11-02), the latest
+   0.17 patch. The LLVM and vectorizer facts above are 0.17.0's; 0.17.1's are unchecked — read
+   its release notes before the move.
 3. **Every Zig move waits for ZLS** (owner's standing practice): zailc moves to a Zig version
    only once ZLS, the Zig Language Server, has a release for it.
    Details: `design-decisions.md` § "Forward path".
