@@ -34,17 +34,19 @@ file that now holds the substance. The full dated narrative this file replaces (
   `git log` before merging into `main`.
 - **Repository:** `github.com/synapticforge1/zailc` since 2026-10-22 (`origin` uses it).
 
-## ▶️ Resume here: the x86-64 version first (owner, 2026-11-05)
+## ▶️ Resume here: stage 1, build the zailc compiler (owner, 2026-11-05)
 
-The order (`roadmap.md` § "The order of work"): **(1) the x86-64 version first** (zail on Linux
-x86_64, zilc's platform and oracle); **(2) a runtime written in Zig** (zilc's former P3); **(3)
-zail's grammar is TypeScript's syntax**; **(4) the Zig 0.17.1 move starts with the first
-nightly**. Releases: nightlies until the MVP, which is the first release, `0.0.1`. Nothing of
-this is scoped or started yet; the first concrete step is scoping item 1 — what "the x86-64
-version" of the clean-slate implementation must contain on Zig 0.17.1, which zilc tests it
-translates first, and where the MVP draws the line between rewritten and compiled-from-C pieces. The method that served step 2 still
-applies: an importer for upstream's lists, an oracle against the release, the two-runtime overlay
-(`link-run.ts`, `corpus-run.ts`).
+**The stages** (`roadmap.md` § "The development stages"), each done when its examples give
+zilc's results: **(1)** build the zailc compiler (Linux x86-64, Zig 0.17.1); **(2)** C; **(3)**
+C++; **(4)** Zig; **(5)** then TypeScript / zail. The order of work around them: x86-64 first, a
+runtime in Zig as the stages need it, TypeScript's syntax for zail, Zig 0.17.1 from the first
+nightly. Releases: nightlies until the MVP, the first release `0.0.1`.
+
+Nothing is scoped or started yet. **The first concrete step is scoping stage 1:** the compiler's
+parts on Zig 0.17.1 (front ends, zailc's own pass in Zig for LLVM 22 IR, LLVM's code generator),
+how its C front end reproduces Fil-C clang's differences (varargs, unions with pointers, pointer
+atomics), and which zilc C examples stage 2 takes first. The method that served the 0.686 work
+still applies: an oracle per piece, then whole programs compared against zilc's results.
 
 ## Open
 
@@ -85,6 +87,7 @@ applies: an importer for upstream's lists, an oracle against the release, the tw
 | 2026-10-27 | The zail language direction (owner): `.zail`, one `string`, `int`/`float` + Zig's numeric set, `/` and `\`, one `zail.json` generating `build.zig`/`build.zig.zon`, packages from URLs and Git | `e03f98e` … `40e3094` | `roadmap.md` § "The zail language", `design-decisions.md` |
 | 2026-10-27 | The Zig version path (owner): 0.15.2 until cross-platform, then 0.17.0 (LLVM 22.1.8, loop vectorizer off); every move waits for ZLS | `7dcba5b` … `1ef2c04` | `roadmap.md` § "The Zig version path", `design-decisions.md` § "Forward path" |
 | 2026-11-05 | Zig target 0.17.0 → 0.17.1 (owner; released 2026-11-02) | `582c84d` | `design-decisions.md` § "Forward path" |
+| 2026-11-05 | The development stages: compiler → C → C++ → Zig → TypeScript/zail, each matching zilc's results | (the commit recording them) | `design-decisions.md`, `roadmap.md` § "The development stages" |
 | 2026-11-05 | `zail-modules`: the libraries programs link (runtime, libc, libc++, dependencies) per project, via `zail init` / `zail add`; compiling needs no libraries, linking does | (the commit recording it) | `design-decisions.md` (the `zail-modules` row), `roadmap.md` |
 | 2026-11-05 | The libc direction (a Zig libc translated from musl function by function, only the functions used; one top, a per-OS bottom), licensing for the clean slate (framework kept; musl's notice via Zig's `lib/libc/musl/COPYRIGHT`; a "Retired" ledger section), and the clean slate's pins (Fil-C 0.687, Zig 0.17.1, zilc `v0.15.2-0.687.1`) | (the commit recording them) | `design-decisions.md`, `licensing.md`, `third_party/LICENSES.md`, `upstream.md`, `roadmap.md` |
 | 2026-11-05 | The clean slate recorded: a new, fully Zig implementation on the latest Zig; zilc as the reference corpus and source of translated tests; parity = same result | `42f7eab` | `design-decisions.md` (the clean-slate row), `roadmap.md` § "The approach", `oracle.md` |

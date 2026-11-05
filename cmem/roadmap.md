@@ -43,6 +43,22 @@ Releases: **nightlies until the MVP; the MVP is the first release, `0.0.1`**.
 4. **The Zig 0.17.1 move starts with the first nightly** (the version path below) — which makes
    a pass that reads LLVM 22 IR the first hard problem.
 
+### The development stages (owner, 2026-11-05)
+
+Each stage is done when its examples compile with zailc and give **zilc's results** (the same
+output, exit code and safety traps — `oracle.md`); only then does the next one start.
+
+| stage | what | its reference | what it first pulls in |
+| --- | --- | --- | --- |
+| **1** | **Build the zailc compiler** (Linux x86-64, Zig 0.17.1): front ends, zailc's own pass in Zig for LLVM 22 IR, LLVM's code generator | — | the pass (nothing existing reads LLVM 22 IR) |
+| **2** | **C**: zilc's C examples, translated as needed, compile and match zilc | zilc's C corpus (78 programs as of 2026-10-08) | ⚠️ zailc's C front end must produce what Fil-C's clang produces where it differs from stock clang — varargs (else musl's `printf` family breaks), unions containing pointers, pointer atomics (`scope.md` § Step 3, risk 2); the Fil-C runtime; the first libc functions (measured from these examples' undefined symbols) |
+| **3** | **C++**: the same for C++ examples | ⚠️ zilc's corpus had no C++ as last recorded (78 C + 78 Zig) — check zilc's current tree; otherwise Fil-C's own C++ tests run through stock Fil-C, or C++ examples run through zilc's toolchain | libc++ / libc++abi, exceptions and unwinding |
+| **4** | **Zig**: zilc's Zig examples, translated from Zig 0.15.2 into 0.17.1 | zilc's Zig corpus (78 programs as of 2026-10-08) | Zig's standard library through the pass; Zig language fidelity (zilc's former P4) |
+| **5** | **TypeScript / zail**: then the zail language (TypeScript's syntax) | the zail section below | the zail front end, `zail.json`, `zail-modules` |
+
+The order of work above stays: the runtime in Zig is built as stages 2–4 need it, and the libc
+grows function by function from what their examples call.
+
 ## What zailc owns (owner, 2026-10-27)
 
 zilc keeps the faithful Fil-C-in-Zig track ("the corpus of truth"); zailc, a clean-slate
