@@ -246,3 +246,28 @@ No zail question is open as of 2026-10-27. Steps 2 and 3 above are the foundatio
   macOS and x86_64 Windows once the runtime builds from `zig build`.
 - aarch64 Windows, iOS and Android are outside cosmo's reach; a native per-OS runtime remains the
   only route there, last.
+- **WebAssembly (planned 2026-11-05, after the five stages).** Zig and LLVM already emit
+  `wasm32-wasi`, and the pass works before the back end, so the checks come for free; the work
+  is the runtime: wasm's stack cannot be read (live pointers on a shadow stack in linear memory),
+  threads are optional, there are no signals and no page protection, the pass's few lines of
+  x86/ARM assembly need wasm equivalents, and `setjmp`/exceptions need wasm's exception
+  handling. It fits the libc design as one more per-OS bottom (WASI; Zig bundles wasi-libc). The
+  gain: memory safety INSIDE the sandbox, which wasm alone does not give. Its output would run on
+  this workspace's own wasm runtimes (wasmrt, wazmrt) — a cross-project item when it starts.
+  Open design points: `design-decisions.md` § Open.
+
+## zail's memory model (2026-11-05): faster where safety allows
+
+From a reviewed web discussion of the Goose memory model (`design-decisions.md`, the memory-model
+row). C, C++ and Zig keep Fil-C's per-object checks and collector. zail's own values use cheaper
+strategies where TypeScript semantics allow — each one MEASURED against plain Fil-C objects
+before it is kept:
+
+| value | strategy | why it is safe | status |
+| --- | --- | --- | --- |
+| compile-time constants | static data, no allocator | live as long as the program | decided |
+| strings | frozen at construction, built through a builder; exact size, packing, interning | immutable in TypeScript; reads stay bounds-checked | 🗓️ confirm |
+| short values | inline, then a Fil-C object when they outgrow it (`StackFallbackAllocator` over Fil-C's `malloc`) | the large case is a full Fil-C object | default proposed |
+| values that never leave their scope | arena or fixed buffer, with the library's slice checks | only if zailc can prove the scope | 🗓️ open |
+| readonly arrays and objects | the string strategy, only if readonly can be made solely by freezing a builder | no writable reference survives | 🗓️ to explore |
+| general objects, arrays, closures | Fil-C objects, per-object checks, collector | shared by reference in TypeScript | decided |
