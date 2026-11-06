@@ -55,20 +55,9 @@ output, exit code and safety traps — `oracle.md`); only then does the next one
 | **3** | **C++**: the same for C++ examples | ⚠️ zilc's corpus had no C++ as last recorded (78 C + 78 Zig) — check zilc's current tree; otherwise Fil-C's own C++ tests run through stock Fil-C, or C++ examples run through zilc's toolchain | libc++ / libc++abi, exceptions and unwinding |
 | **4** | **Zig**: zilc's Zig examples, translated from Zig 0.15.2 into 0.17.1 | zilc's Zig corpus (78 programs as of 2026-10-08) | Zig's standard library through the pass; Zig language fidelity (zilc's former P4) |
 | **5** | **TypeScript / zail**: then the zail language (TypeScript's syntax) | the zail section below | the zail front end, `zail.json`, `zail-modules` |
-| **6** | **Go**, through an LLVM-based Go compiler — **TinyGo, Gollvm or LLGo** (owner, 2026-11-05; the choice open) | Go's own test programs, run with the stock Go compiler (zilc has no Go) | ⚠️ the Go runtime (its GC, goroutine scheduler, moving stacks, pointer↔integer casts, context-switch assembly) ported onto Fil-C's model — one collector, not two; the Go front end's LLVM version matching zailc's (22); the front end is Go (TinyGo) or C++ (Gollvm), not Zig |
 
-**Stage 6, Go (added 2026-11-05; assessment of that day, the projects' current state
-UNVERIFIED).** Candidates: **TinyGo** (Go compiler on LLVM, written in Go, small runtime mostly
-in Go, active; BSD-3-Clause) — the most practical on paper; **Gollvm** (Google's LLVM back end
-for gccgo's C++ front end, gccgo's large `libgo` runtime, largely dormant; BSD-style + LLVM's
-Apache); **LLGo** (the Go+ project's Go-on-LLVM compiler, young; Apache-2.0; not the old LLVM-tree
-llgo, removed years ago). All three emit LLVM IR that zailc's pass could take; the work is
-elsewhere: (1) the Go runtime onto Fil-C's model — the bulk of the effort, likely more than the
-C++ stage; (2) the LLVM version; (3) the clean slate's "fully Zig" rule — a Go or C++ front end
-is either an external tool zail drives, or a very large translation into Zig. What Go gains:
-Fil-C's checks on `unsafe` code and across Go↔C calls (cgo), and one toolchain for C, C++, Zig,
-zail and Go. **First probe (cheap, can kill the plan):** TinyGo emits LLVM IR for a
-hello-world; put it through Fil-C's pass; see what breaks first.
+A stage 6 for Go (TinyGo, Gollvm or LLGo) was considered and dropped on 2026-11-05 (owner);
+the reasons are in `design-decisions.md`.
 
 The order of work above stays: the runtime in Zig is built as stages 2–4 need it, and the libc
 grows function by function from what their examples call.
