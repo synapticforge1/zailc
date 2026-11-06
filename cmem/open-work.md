@@ -53,6 +53,10 @@ still applies: an oracle per piece, then whole programs compared against zilc's 
 - 🗓️ **Follow-ups of the 2026-11-05 release decision** (`design-decisions.md`, the `0.0.1` row):
   `build.zig.zon` reads `0.1.0` and must read `0.0.1` before the release gate opens; how a
   nightly is numbered and published; what the MVP contains.
+- 🗓️ **zail's memory model — five open questions** (`design-decisions.md` § Open; owner's rule:
+  faster wherever safety allows, measured): allocation per value; immutable strings through a
+  builder; readonly-by-freeze for arrays and objects; whether Fil-C makes constant globals
+  read-only; WebAssembly's collector (a later target).
 - ⚠️ **The first nightly needs a Fil-C pass that reads LLVM 22 IR** (Zig 0.17.1's; Fil-C 0.687's
   pass reads LLVM 20, zilc's Zig pass is not started) — `design-decisions.md` § "Forward path".
 - 🗓️ **Pending owner confirmation:** the 2026-10-27 type and operator decisions (`int`/`float`,
@@ -87,6 +91,7 @@ still applies: an oracle per piece, then whole programs compared against zilc's 
 | 2026-10-27 | The zail language direction (owner): `.zail`, one `string`, `int`/`float` + Zig's numeric set, `/` and `\`, one `zail.json` generating `build.zig`/`build.zig.zon`, packages from URLs and Git | `e03f98e` … `40e3094` | `roadmap.md` § "The zail language", `design-decisions.md` |
 | 2026-10-27 | The Zig version path (owner): 0.15.2 until cross-platform, then 0.17.0 (LLVM 22.1.8, loop vectorizer off); every move waits for ZLS | `7dcba5b` … `1ef2c04` | `roadmap.md` § "The Zig version path", `design-decisions.md` § "Forward path" |
 | 2026-11-05 | Zig target 0.17.0 → 0.17.1 (owner; released 2026-11-02) | `582c84d` | `design-decisions.md` § "Forward path" |
+| 2026-11-05 | zail's memory model (from the Goose discussion: faster where safety allows, measured) and WebAssembly as a later target; five open questions | (the commit recording them) | `design-decisions.md`, `roadmap.md` §§ "zail's memory model", platform section |
 | 2026-11-05 | Stage 6 (Go via TinyGo, Gollvm or LLGo) added, assessed, then dropped the same day (owner) | `f5a2f2d` (added); the drop's commit | `design-decisions.md` (the ❌ row) |
 | 2026-11-05 | The development stages: compiler → C → C++ → Zig → TypeScript/zail, each matching zilc's results | (the commit recording them) | `design-decisions.md`, `roadmap.md` § "The development stages" |
 | 2026-11-05 | `zail-modules`: the libraries programs link (runtime, libc, libc++, dependencies) per project, via `zail init` / `zail add`; compiling needs no libraries, linking does | (the commit recording it) | `design-decisions.md` (the `zail-modules` row), `roadmap.md` |
