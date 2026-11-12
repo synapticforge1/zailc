@@ -53,6 +53,14 @@ still applies: an oracle per piece, then whole programs compared against zilc's 
 - 🗓️ **Follow-ups of the 2026-11-05 release decision** (`design-decisions.md`, the `0.0.1` row):
   `build.zig.zon` reads `0.1.0` and must read `0.0.1` before the release gate opens; how a
   nightly is numbered and published; what the MVP contains.
+- ⏳ **The release path converges on the workspace's uniform shape before `0.0.1`** (letters H32,
+  H33; `release.md` § "zailc against the uniform shape"): checks before CI tags, the build split
+  from `contents: write`, the attestation read back, actions pinned by hash and Bun by sha256, a
+  user's read-back, re-run safety everywhere. The release gate stays `closed` meanwhile.
+- 🔴 **`main` cannot be pushed** (since 2026-11-05): GitHub rejects every push of `main` with
+  `fatal error in commit_refs_rules`; GitHub's status was operational and no rule on the repo is
+  visible without signing in. 🗓️ OWNER: check the `synapticforge1` organisation's and the repo's
+  rulesets. Until then every commit since `258f0d2` is local only.
 - 🗓️ **zail's memory model — five open questions** (`design-decisions.md` § Open; owner's rule:
   faster wherever safety allows, measured): allocation per value; immutable strings through a
   builder; readonly-by-freeze for arrays and objects; whether Fil-C makes constant globals
@@ -91,6 +99,7 @@ still applies: an oracle per piece, then whole programs compared against zilc's 
 | 2026-10-27 | The zail language direction (owner): `.zail`, one `string`, `int`/`float` + Zig's numeric set, `/` and `\`, one `zail.json` generating `build.zig`/`build.zig.zon`, packages from URLs and Git | `e03f98e` … `40e3094` | `roadmap.md` § "The zail language", `design-decisions.md` |
 | 2026-10-27 | The Zig version path (owner): 0.15.2 until cross-platform, then 0.17.0 (LLVM 22.1.8, loop vectorizer off); every move waits for ZLS | `7dcba5b` … `1ef2c04` | `roadmap.md` § "The Zig version path", `design-decisions.md` § "Forward path" |
 | 2026-11-05 | Zig target 0.17.0 → 0.17.1 (owner; released 2026-11-02) | `582c84d` | `design-decisions.md` § "Forward path" |
+| 2026-11-12 | Workspace letters answered: H34 committed (+ H35's three words); H35 slots (`review-process.md`); H31 Bun 1.4.4 (three workflows, `@types/bun`, `tools/bun.lock`); H30 the GitHub CLI out of `publish.yml` (`tools/release/github-release.ts`, rehearsed 9/9, two mutants caught); H32/H33 `release.md` (the shape; convergence before `0.0.1`); C37 the Zig 0.17 breaks; `.claude/settings.local.json` ignored | (the commit recording them) | `release.md`, `review-process.md`, `upstream.md`, `releasing.md`, `INDEX.md` |
 | 2026-11-05 | zail's memory model (from the Goose discussion: faster where safety allows, measured) and WebAssembly as a later target; five open questions | (the commit recording them) | `design-decisions.md`, `roadmap.md` §§ "zail's memory model", platform section |
 | 2026-11-05 | Stage 6 (Go via TinyGo, Gollvm or LLGo) added, assessed, then dropped the same day (owner) | `f5a2f2d` (added); the drop's commit | `design-decisions.md` (the ❌ row) |
 | 2026-11-05 | The development stages: compiler → C → C++ → Zig → TypeScript/zail, each matching zilc's results | (the commit recording them) | `design-decisions.md`, `roadmap.md` § "The development stages" |
@@ -112,7 +121,12 @@ look it up in that file's map. Answered 2026-11-05, zilc (the creator) to verify
 **C22** (cross-platform is zailc's, Linux aarch64 included), **C23** (zilc on Fil-C 0.687,
 released `v0.15.2-0.687.1`), **C24** (steps 2–3 moved to zilc; zailc keeps W-10, the zail
 language, newer Zig, cross-platform), **C25** (zilc finished yolo musl's shared half) — all in
-`design-decisions.md` (the split row), `roadmap.md`, `oracle.md`.
+`design-decisions.md` (the split row), `roadmap.md`, `oracle.md`. Answered 2026-11-12, the
+workspace (the creator) to verify on `origin/main` and close: **H30** (no GitHub CLI), **H31**
+(Bun 1.4.4), **H32** / **H33** (`release.md`; the CI job order converges before `0.0.1`), **H34**
+(the Owner-commands section committed), **H35** (the review words and slots), **C37** (the Zig
+0.17 breaks, record-only). ⚠️ The workspace can only verify once `main` can be pushed (Open,
+above).
 
 **Opened by zailc (zailc verifies and closes):** **C28** (2026-11-05, to zilc, record-only):
 zailc is a clean slate on the latest Zig and zilc is its reference corpus — zilc's tests,

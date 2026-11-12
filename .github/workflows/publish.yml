@@ -43,10 +43,10 @@ jobs:
           ref: refs/tags/${{ inputs.tag || github.ref_name }}
           fetch-depth: 0 # every tag, so the compatibility check finds the previous release
 
-      - name: Install Bun 1.4.3
+      - name: Install Bun 1.4.4
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.4.3
+          bun-version: 1.4.4
 
       # The gate as of the TAGGED commit. auto-tag only calls this with the gate open; this step
       # stops a hand-pushed v* tag from releasing while the gate is closed. Nothing has been
@@ -125,18 +125,17 @@ jobs:
 
       # Notes: CHANGELOG.md's section for this version if there is one, else GitHub's generated
       # notes. The section runs from "## X.Y.Z" to the next "## ".
+      # No GitHub CLI (workspace letter H30): tools/release/github-release.ts uses GitHub's REST API with
+      # this job's token, refuses a tag GitHub does not have, is safe to re-run, and reads the page
+      # back.
       - name: Create GitHub Release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           V="${TAG#v}"
           NOTES="$RUNNER_TEMP/notes.md"
+          : > "$NOTES"
           if [ -f CHANGELOG.md ]; then
             awk -v h="## $V" '$0==h{on=1;next} on&&/^## /{exit} on' CHANGELOG.md > "$NOTES"
           fi
-          if [ -s "$NOTES" ]; then
-            gh release create "$TAG" --title "zailc $TAG" --notes-file "$NOTES" --verify-tag "$DIST"/*
-          else
-            echo "::warning::no CHANGELOG.md section '## $V'; using generated notes"
-            gh release create "$TAG" --title "zailc $TAG" --generate-notes --verify-tag "$DIST"/*
-          fi
+          bun run tools/release/github-release.ts --tag "$TAG" --title "zailc $TAG" --notes-file "$NOTES" "$DIST"/*

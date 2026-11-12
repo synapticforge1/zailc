@@ -168,12 +168,14 @@ belong to the next minor:
 | --- | --- | --- |
 | `ci.yml` | push to `main`, PRs | Zig 0.15.2; `zig fmt --check`; the tools' type-check; the surface snapshot check; `zig build test` (SHA-256 against Ruby's output); smoke: `zailc-gen header` must hash to Ruby's header, and `zailc-gen --version`'s first line must be `zailc-gen <build.zig.zon version>` |
 | `auto-tag.yml` | push to `main` | reads the release gate first (`tools/release/gate.ts`): **closed = a notice, green, nothing else**; open: reads `.version` (fails if the line is missing or doubled); if `v<version>` has no tag, pushes the annotated tag and **calls `publish.yml`** |
-| `publish.yml` | `push: tags: [v*]`, or `workflow_call` from auto-tag | **refuses unless the release gate is open at the tagged commit** (before any build or upload); checks the tag matches `build.zig.zon`, runs the compatibility gate against the previous tag (full history checked out), runs the gates, builds `zailc-gen` (`ReleaseSafe`, `x86_64-linux-musl`), smoke-tests the binary FROM THE ARCHIVE (Ruby's header hash, and `--version` naming the tag's version), attests build provenance, creates the GitHub Release with the archives and `SHA256SUMS`; notes from `CHANGELOG.md` § X.Y.Z, else generated |
+| `publish.yml` | `push: tags: [v*]`, or `workflow_call` from auto-tag | **refuses unless the release gate is open at the tagged commit** (before any build or upload); checks the tag matches `build.zig.zon`, runs the compatibility gate against the previous tag (full history checked out), runs the gates, builds `zailc-gen` (`ReleaseSafe`, `x86_64-linux-musl`), smoke-tests the binary FROM THE ARCHIVE (Ruby's header hash, and `--version` naming the tag's version), attests build provenance, creates the GitHub Release with the archives and `SHA256SUMS` through `tools/release/github-release.ts` (GitHub's REST API, no GitHub CLI — letter H30, 2026-11-12; refuses a tag GitHub lacks, re-run safe, reads the page back); notes from `CHANGELOG.md` § X.Y.Z, else generated |
+
+**The uniform shape and the record:** [release.md](release.md) (owner, 2026-11-10, letter H33) — zailc slot by slot, what converges before `0.0.1`, and the Release History.
 
 - **Release binaries are built by `publish.yml` only, never locally and uploaded by hand.** This is
   binaryang's "never run `deno publish` locally": a hand-uploaded binary carries no attestation,
   and that cannot be fixed on that version.
-- 🔧 **Departure from binaryang: `workflow_call`, not `gh workflow run`.** A tag pushed by
+- 🔧 **Departure from binaryang: `workflow_call`, not a dispatch through the GitHub CLI.** A tag pushed by
   auto-tag with `GITHUB_TOKEN` cannot trigger `push: tags` (GitHub's recursion guard), and
   binaryang's dispatch fallback never published, 0 of 4 (JSR authorised the dispatch's actor,
   `github-actions[bot]`). Calling `publish.yml` as a reusable workflow inside auto-tag's own run
