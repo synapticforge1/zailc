@@ -11,6 +11,18 @@
 Nothing of the clean slate is written yet, so nothing in the tree reads these pins yet. A move of
 any of them is recorded here with its date.
 
+**What Zig 0.17 breaks, measured by loader-zig on its move to 0.17.1** (workspace item C37,
+2026-11-08; `../cmem/handoffs.md`, loader-zig's notes; loader-zig `f417f71`): five removed APIs and
+their 0.17 forms — `@cImport` → `b.addTranslateC` (module import `"c"`); `b.args` →
+`Run.addPassthruArgs()`; `Run.addPathDir` → the run's env map (`getEnvMap` +
+`setEnvironmentVariable("PATH", …)`); `b.pathFromRoot` → `b.root.joinString`; `@typeInfo`
+records → `field_names` / `field_types`, `decl_names`, `param_types`, `attrs`, `error_names`,
+`field_values`. Also: **code after a comptime-known `return` is analyzed in 0.17**, so a trailing
+`@compileError` fires. For zailc: the clean slate is written for 0.17.1 from its first line, so
+these matter where zilc's 0.15.2 tests and zailc's `build.zig` code are translated; and **a gate
+that builds an OLD tag with today's toolchain** (the compatibility gate's previous-release tests,
+`releasing.md`) can fail because the old tag no longer builds — not because anything regressed.
+
 ## The 0.686 code's pins (the existing tree)
 
 | upstream | pinned | why this one | where |
