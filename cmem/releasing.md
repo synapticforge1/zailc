@@ -20,9 +20,9 @@ and why the version bump is a separate, deliberate commit.
 
 **🚦 Behind a release gate (owner, 2026-10-08: "I would prefer the guard so we keep main up to date with finished branches and releases when they are ready").** `.github/release-gate` reads
 `closed` until the first release is due: Fil-C fully converted to Zig and verified against zilc's
-setups, so the user installs Zig and only Zig (`design-decisions.md` 🎯; 🔁 under review since
+setups, so the user installs Zig and only Zig (DD-16, now in `archive/decisions-0.686.md`; 🔁 under review since
 2026-11-05, because that conversion moved to zilc — the redefinition is an open owner question in
-`design-decisions.md` § Open). While it is closed,
+`design-decisions.md` § Open, answered 2026-11-05 by DD-32). While it is closed,
 **`main` is pushed as usual** and takes every finished branch; CI runs on it; auto-tag stops with
 a notice and releases nothing; `publish.yml` refuses even a hand-pushed `v*` tag. **Opening the
 gate is the owner's decision**, made as its own commit (`closed` → `open`) on a branch, merged
@@ -50,7 +50,7 @@ this repo concurrently: re-read `git log` before merging into `main`.
   recorded in `upstream.md` and printed by `zailc-gen --version` (the Zig that built it; the Fil-C
   release and commit its forwarder tables were imported from).
 - 🔒 **Semantic Versioning 2.0.0; components are unbounded and nothing ever carries** (workspace
-  owner rule, 2026-09-20: `../cmem/working-rules.md` § Git, drift W6). `0.1.9 → 0.1.10`, never
+  owner rule, 2026-09-20: `../workspace/cmem/working-rules.md` § Git, drift W6). `0.1.9 → 0.1.10`, never
   `0.2.0`. *(Retired 2026-10-27: "Sub-version capped at 9 (binaryang's rule)", adopted here
   2026-10-08 after the owner had already retired every cap; workspace drift X10, letter H26.)*
 - **PATCH is the default.** A release is a patch unless it adds or breaks something; a
@@ -72,7 +72,7 @@ this repo concurrently: re-read `git log` before merging into `main`.
 
 ## The compatibility gate — a bump is gated, never judged
 
-🔒 Workspace owner rule, 2026-09-20 (`../cmem/layout-and-packaging.md` § "The compatibility
+🔒 Workspace owner rule, 2026-09-20 (`../workspace/cmem/layout-and-packaging.md` § "The compatibility
 gate"); built here 2026-10-27 (owner: "yes add the bump gate").
 
 - **The surface** is extracted from the source by `tools/release/surface.ts`, never typed:
@@ -164,11 +164,24 @@ belong to the next minor:
 
 ## The workflows (`.github/workflows/`, 2026-10-08)
 
-| workflow | trigger | does |
-| --- | --- | --- |
-| `ci.yml` | push to `main`, PRs | Zig 0.15.2; `zig fmt --check`; the tools' type-check; the surface snapshot check; `zig build test` (SHA-256 against Ruby's output); smoke: `zailc-gen header` must hash to Ruby's header, and `zailc-gen --version`'s first line must be `zailc-gen <build.zig.zon version>` |
-| `auto-tag.yml` | push to `main` | reads the release gate first (`tools/release/gate.ts`): **closed = a notice, green, nothing else**; open: reads `.version` (fails if the line is missing or doubled); if `v<version>` has no tag, pushes the annotated tag and **calls `publish.yml`** |
-| `publish.yml` | `push: tags: [v*]`, or `workflow_call` from auto-tag | **refuses unless the release gate is open at the tagged commit** (before any build or upload); checks the tag matches `build.zig.zon`, runs the compatibility gate against the previous tag (full history checked out), runs the gates, builds `zailc-gen` (`ReleaseSafe`, `x86_64-linux-musl`), smoke-tests the binary FROM THE ARCHIVE (Ruby's header hash, and `--version` naming the tag's version), attests build provenance, creates the GitHub Release with the archives and `SHA256SUMS` through `tools/release/github-release.ts` (GitHub's REST API, no GitHub CLI — letter H30, 2026-11-12; refuses a tag GitHub lacks, re-run safe, reads the page back); notes from `CHANGELOG.md` § X.Y.Z, else generated |
+- **`ci.yml`** — push to `main`, PRs
+  *does:* Zig 0.15.2; `zig fmt --check`; the tools' type-check; the surface snapshot check; `zig build test`
+  (SHA-256 against Ruby's output); smoke: `zailc-gen header` must hash to Ruby's header, and `zailc-gen
+  --version`'s first line must be `zailc-gen <build.zig.zon version>`
+
+- **`auto-tag.yml`** — push to `main`
+  *does:* reads the release gate first (`tools/release/gate.ts`): **closed = a notice, green, nothing else**;
+  open: reads `.version` (fails if the line is missing or doubled); if `v<version>` has no tag, pushes the
+  annotated tag and **calls `publish.yml`**
+
+- **`publish.yml`** — `push: tags: [v*]`, or `workflow_call` from auto-tag
+  *does:* **refuses unless the release gate is open at the tagged commit** (before any build or upload);
+  checks the tag matches `build.zig.zon`, runs the compatibility gate against the previous tag (full history
+  checked out), runs the gates, builds `zailc-gen` (`ReleaseSafe`, `x86_64-linux-musl`), smoke-tests the
+  binary FROM THE ARCHIVE (Ruby's header hash, and `--version` naming the tag's version), attests build
+  provenance, creates the GitHub Release with the archives and `SHA256SUMS` through
+  `tools/release/github-release.ts` (GitHub's REST API, no GitHub CLI — letter H30, 2026-11-12; refuses a tag
+  GitHub lacks, re-run safe, reads the page back); notes from `CHANGELOG.md` § X.Y.Z, else generated
 
 **The uniform shape and the record:** [release.md](release.md) (owner, 2026-11-10, letter H33) — zailc slot by slot, what converges before `0.0.1`, and the Release History.
 

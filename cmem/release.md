@@ -15,20 +15,48 @@ provenance (a git-tag ecosystem, release-process.md § 6). Never from the owner'
 
 ## zailc against the uniform shape (release-process.md § 5, measured 2026-11-12)
 
-| slot | zailc today | status |
-| --- | --- | --- |
-| U1 the go and the level | the owner's go; `bump.ts` takes the level as an argument | meets |
-| U2 merge first, the bump its own commit | `releasing.md` § "RULE — the version line ARMS a release" | meets |
-| U3 the bump tool | `tools/release/bump.ts`: surface floor (the compatibility gate) | meets the floor; the clean-tree guard (untracked files count) and previous-release tests are ⏳ |
-| U4 the release script | none: pushing `main` with an untagged version releases (`auto-tag.yml`) — a recorded difference | ⏳ decide before 0.0.1 |
-| U5 `checks` first, on the pushed commit, before any tag | ⏳ today `auto-tag.yml` tags first and `publish.yml` runs the gates after | ⏳ converge before 0.0.1 |
-| U6 CI creates the tag after U5 | `auto-tag.yml` creates it (with the release gate) | order ⏳ (U5) |
-| U7 the page from the tag | `publish.yml` → `tools/release/github-release.ts` (REST API, no GitHub CLI; refuses a tag GitHub lacks; re-run safe; read back; rehearsed against a local fake of the API, 9/9, two mutants caught) — 2026-11-12, letter H30 | ✅ no GitHub CLI; H32's job order ⏳ with U5 |
-| U8 publish last, only its credential | the build and `contents: write` share one job; the attestation is produced but not read back | ⏳ split the job; read the attestation back through the REST attestations API |
-| U9 pins | Zig 0.15.2 exact; Bun 1.4.4 (H31, 2026-11-12); actions by major tag (`@v6`, `@v2`) | ⏳ actions to commit hashes; Bun by sha256 |
-| U10 read back as a user | the smoke test runs the binary FROM the archive | ⏳ download the released archive in a scratch folder |
-| U11 the record | this file | ✅ |
-| U12 failure: re-run, never a new or moved tag | the page step is re-run safe (U7) | ⏳ every job skips what is done |
+Each item: **slot** — zailc today.
+
+- **U1 the go and the level** — the owner's go; `bump.ts` takes the level as an argument
+  *status:* meets
+
+- **U2 merge first, the bump its own commit** — `releasing.md` § "RULE — the version line ARMS a release"
+  *status:* meets
+
+- **U3 the bump tool** — `tools/release/bump.ts`: surface floor (the compatibility gate)
+  *status:* meets the floor; the clean-tree guard (untracked files count) and previous-release tests are ⏳
+
+- **U4 the release script** — none: pushing `main` with an untagged version releases (`auto-tag.yml`) — a
+  recorded difference
+  *status:* ⏳ decide before 0.0.1
+
+- **U5 `checks` first, on the pushed commit, before any tag** — ⏳ today `auto-tag.yml` tags first and
+  `publish.yml` runs the gates after
+  *status:* ⏳ converge before 0.0.1
+
+- **U6 CI creates the tag after U5** — `auto-tag.yml` creates it (with the release gate)
+  *status:* order ⏳ (U5)
+
+- **U7 the page from the tag** — `publish.yml` → `tools/release/github-release.ts` (REST API, no GitHub CLI;
+  refuses a tag GitHub lacks; re-run safe; read back; rehearsed against a local fake of the API, 9/9, two
+  mutants caught) — 2026-11-12, letter H30
+  *status:* ✅ no GitHub CLI; H32's job order ⏳ with U5
+
+- **U8 publish last, only its credential** — the build and `contents: write` share one job; the attestation is
+  produced but not read back
+  *status:* ⏳ split the job; read the attestation back through the REST attestations API
+
+- **U9 pins** — Zig 0.15.2 exact; Bun 1.4.4 (H31, 2026-11-12); actions by major tag (`@v6`, `@v2`)
+  *status:* ⏳ actions to commit hashes; Bun by sha256
+
+- **U10 read back as a user** — the smoke test runs the binary FROM the archive
+  *status:* ⏳ download the released archive in a scratch folder
+
+- **U11 the record** — this file
+  *status:* ✅
+
+- **U12 failure: re-run, never a new or moved tag** — the page step is re-run safe (U7)
+  *status:* ⏳ every job skips what is done
 
 **Before 0.0.1** (the release gate stays `closed` until then; nothing can release meanwhile):
 U3's guards, U4, U5/U6 order, U8 split and read-back, U9 hashes, U10, U12 — each a CHANGED release

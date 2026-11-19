@@ -48,13 +48,30 @@ Releases: **nightlies until the MVP; the MVP is the first release, `0.0.1`**.
 Each stage is done when its examples compile with zailc and give **zilc's results** (the same
 output, exit code and safety traps — `oracle.md`); only then does the next one start.
 
-| stage | what | its reference | what it first pulls in |
-| --- | --- | --- | --- |
-| **1** | **Build the zailc compiler** (Linux x86-64, Zig 0.17.1): front ends, zailc's own pass in Zig for LLVM 22 IR, LLVM's code generator | — | the pass (nothing existing reads LLVM 22 IR) |
-| **2** | **C**: zilc's C examples, translated as needed, compile and match zilc | zilc's C corpus (78 programs as of 2026-10-08) | ⚠️ zailc's C front end must produce what Fil-C's clang produces where it differs from stock clang — varargs (else musl's `printf` family breaks), unions containing pointers, pointer atomics (`scope.md` § Step 3, risk 2); the Fil-C runtime; the first libc functions (measured from these examples' undefined symbols) |
-| **3** | **C++**: the same for C++ examples | ⚠️ zilc's corpus had no C++ as last recorded (78 C + 78 Zig) — check zilc's current tree; otherwise Fil-C's own C++ tests run through stock Fil-C, or C++ examples run through zilc's toolchain | libc++ / libc++abi, exceptions and unwinding |
-| **4** | **Zig**: zilc's Zig examples, translated from Zig 0.15.2 into 0.17.1 | zilc's Zig corpus (78 programs as of 2026-10-08) | Zig's standard library through the pass; Zig language fidelity (zilc's former P4) |
-| **5** | **TypeScript / zail**: then the zail language (TypeScript's syntax) | the zail section below | the zail front end, `zail.json`, `zail-modules` |
+- ****1**** — **Build the zailc compiler** (Linux x86-64, Zig 0.17.1): front ends, zailc's own pass in Zig for
+  LLVM 22 IR, LLVM's code generator
+  *its reference:* —
+  *what it first pulls in:* the pass (nothing existing reads LLVM 22 IR)
+
+- ****2**** — **C**: zilc's C examples, translated as needed, compile and match zilc
+  *its reference:* zilc's C corpus (78 programs as of 2026-10-08)
+  *what it first pulls in:* ⚠️ zailc's C front end must produce what Fil-C's clang produces where it differs
+  from stock clang — varargs (else musl's `printf` family breaks), unions containing pointers, pointer atomics
+  (`scope.md` § Step 3, risk 2); the Fil-C runtime; the first libc functions (measured from these examples'
+  undefined symbols)
+
+- ****3**** — **C++**: the same for C++ examples
+  *its reference:* ⚠️ zilc's corpus had no C++ as last recorded (78 C + 78 Zig) — check zilc's current tree;
+  otherwise Fil-C's own C++ tests run through stock Fil-C, or C++ examples run through zilc's toolchain
+  *what it first pulls in:* libc++ / libc++abi, exceptions and unwinding
+
+- ****4**** — **Zig**: zilc's Zig examples, translated from Zig 0.15.2 into 0.17.1
+  *its reference:* zilc's Zig corpus (78 programs as of 2026-10-08)
+  *what it first pulls in:* Zig's standard library through the pass; Zig language fidelity (zilc's former P4)
+
+- ****5**** — **TypeScript / zail**: then the zail language (TypeScript's syntax)
+  *its reference:* the zail section below
+  *what it first pulls in:* the zail front end, `zail.json`, `zail-modules`
 
 A stage 6 for Go (TinyGo, Gollvm or LLGo) was considered and dropped on 2026-11-05 (owner);
 the reasons are in `design-decisions.md`.
@@ -85,7 +102,7 @@ beyond it — the latest Zig, other platforms:
   adaptations where its user libc differs. Linux x86-64 first. It reaches programs through the
   project's `zail-modules` folder (`zail init` / `zail add`, below), which must cover every libc
   function a project's C code calls — translated, or its musl original compiled through the pass
-  until it is (`design-decisions.md`, the libc and `zail-modules` rows).
+  until it is (`design-decisions.md` DD-36; `zail-language.md` DD-39).
 - **Compiling needs no libraries; linking and running do.** zailc compiles with its front ends,
   the pass, LLVM's code generator and, for C/C++, the headers. The programs it produces link the
   Fil-C runtime (every program), the libc (C/C++ code, and Zig/zail code that calls C) and
@@ -114,7 +131,7 @@ same objects or same behaviour where code is compiled.
 - [x] **The forwarder generator in Zig** (2026-10-08): `src/gen/`, byte-identical to Ruby for
       v0.686 (`testing.md`).
 - [x] **`find_clang_include_dir.rb`**: not ported; `build.zig` will use Zig's own `lib/include`
-      (`design-decisions.md`).
+      (DD-08, `archive/decisions-0.686.md`).
 - [x] **musl's header install in Zig** (2026-10-08): `zailc-gen musl-headers` writes the
       `yolo-include` tree byte-identical to `make install-headers` (219 files; `testing.md`).
 - [x] **libpas's stock half, `filc_crt.o`, `filc_mincrt.o`, `libyolounwind.a` through
@@ -159,7 +176,7 @@ same objects or same behaviour where code is compiled.
 - [→ zilc Z1] **The three Fil-C-compiled pieces** (`filc/src` ~2.5k lines, user libc ~102k, libc++ /
       libc++abi): through Fil-C's clang inside `zig build` as a development bridge only; they
       ship compiled by zailc's own pass (step 3). Nothing upstream-built ships (owner, 2026-10-08,
-      `design-decisions.md` 🎯).
+      DD-16, `archive/decisions-0.686.md`).
 - [→ zilc Z1] **A Fil-C program linked entirely from `zig build`'s outputs** runs, traps out-of-bounds,
       and zilc's corpus passes against it as it does against the prebuilt runtime.
 - [→ zilc Z1] **Fil-C's own test suite** against the `zig build` runtime (zilc's `run-filc-tests.ts`).
@@ -167,7 +184,7 @@ same objects or same behaviour where code is compiled.
 ## Step 3 — the pass in Zig (🔁 moved to zilc as Z2, 2026-10-27; never started here)
 
 All four items below are zilc's now. zailc still needs the result for the Zig move (the
-"Forward path" in `design-decisions.md`): a pass that accepts the newer Zig's LLVM IR.
+DD-49 in `zig-version-path.md`): a pass that accepts the newer Zig's LLVM IR.
 
 - [→ zilc Z2] An LLVM IR text model in Zig (parser, use lists, RAUW, retyping, printer, DataLayout),
       covering what Zig 0.15.2 and clang 20 emit, debug metadata included (~8–12k lines).
@@ -183,7 +200,7 @@ All four items below are zilc's now. zailc still needs the result for the Zig mo
 > 🔁 **2026-11-05 (owner): "the zig 0.17.1 move will start with the first nightly version."**
 > The move no longer waits for cross-platform: item 1 ends when the first nightly is built, and
 > that nightly is on Zig 0.17.1. Needs first: a Fil-C pass that accepts LLVM 22 IR (Fil-C 0.687's
-> reads LLVM 20; zilc's Zig pass is not started) — `design-decisions.md` § "Forward path".
+> reads LLVM 20; zilc's Zig pass is not started) — `zig-version-path.md` (DD-49).
 
 1. **Zig 0.15.2** (LLVM 20, the LLVM of Fil-C 0.686 and 0.687; zilc's Zig): the Zig of zailc's
    existing 0.686 code and of the zilc tests zailc translates. Since the clean slate
@@ -202,7 +219,7 @@ All four items below are zilc's now. zailc still needs the result for the Zig mo
    its release notes before the move.
 3. **Every Zig move waits for ZLS** (owner's standing practice): zailc moves to a Zig version
    only once ZLS, the Zig Language Server, has a release for it.
-   Details: `design-decisions.md` § "Forward path".
+   Details: `zig-version-path.md` (DD-49).
 
 ## The zail language (owner, 2026-10-27; first release `0.0.1` decided 2026-11-05)
 
@@ -214,11 +231,11 @@ first release.) zailc becomes the compiler for a language, **zail**:
   first stated 2026-10-27 as "similar to TypeScript and Zig"). Proposed, pending the owner: the
   type and operator decisions below stay as zail's additions to it (`int`/`float` and Zig's
   sized types; `\`). Source file extension **`.zail`** (first stated as
-  `.zls`; changed the same day to avoid ZLS, the Zig Language Server — `design-decisions.md`).
+  `.zls`; changed the same day to avoid ZLS, the Zig Language Server — `zail-language.md` DD-27).
 - **Classes, one `string` type, and numbers merged from C, C++, Zig and TypeScript**: inferred
   `int` (i64) and `float` (f64) for everyday code, the full Zig/C set when needed, no casts in
   loops or indexes, `/` always true division and `\` integer division (decided 2026-10-27,
-  `design-decisions.md`).
+  `zail-language.md` DD-28).
 - **String and array functions like TypeScript's** (its standard methods on strings and arrays).
 - **Compiles a mix of project files — C, C++, Zig and zail (`.zail`) — with Fil-C's safety
   guarantees** across all of them.
@@ -226,7 +243,7 @@ first release.) zailc becomes the compiler for a language, **zail**:
   manifest and build description in one file, with comments and `tasks`; `zail add` /
   `remove` / `update` edit it, `zail.lock` pins versions and hashes, and the toolchain generates
   `build.zig` / `build.zig.zon` into `.zail/`. Packages come from URLs and Git repositories, as
-  Zig's do, and every dependency is built from source by zailc (`design-decisions.md`).
+  Zig's do, and every dependency is built from source by zailc (`zail-language.md` DD-29, DD-30).
 - **`zail-modules`, per project** (decided 2026-11-05): the libraries a program links — the Fil-C
   runtime, the libc, libc++, and every dependency — placed there by `zail init` / `zail add`
   (the role `node_modules` has for Bun and Deno), built from source by zailc, pinned by
@@ -254,11 +271,11 @@ No zail question is open as of 2026-10-27. Steps 2 and 3 above are the foundatio
   handling. It fits the libc design as one more per-OS bottom (WASI; Zig bundles wasi-libc). The
   gain: memory safety INSIDE the sandbox, which wasm alone does not give. Its output would run on
   this workspace's own wasm runtimes (wasmrt, wazmrt) — a cross-project item when it starts.
-  Open design points: `design-decisions.md` § Open.
+  Open design points: `zail-language.md` § Open.
 
 ## zail's memory model (2026-11-05): faster where safety allows
 
-From a reviewed web discussion of the Goose memory model (`design-decisions.md`, the memory-model
+From a reviewed web discussion of the Goose memory model (`zail-language.md` DD-42, the memory-model
 row). C, C++ and Zig keep Fil-C's per-object checks and collector. zail's own values use cheaper
 strategies where TypeScript semantics allow — each one MEASURED against plain Fil-C objects
 before it is kept:

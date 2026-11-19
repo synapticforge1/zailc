@@ -2,7 +2,7 @@
 
 🔒 **The process is the workspace's, the same in every project** (owner, 2026-11-12: "accept the
 review process and make it a standard for all projects"; letter H35):
-`../cmem/review-process.md`. The owner's words "review", "security review" and "hardening review"
+`../workspace/cmem/review-process.md`. The owner's words "review", "security review" and "hardening review"
 map to its §§ 2, 3 and 4 (and to this repo's "Owner commands" in `INDEX.md`). The floor (§ 1)
 applies unchanged: fresh reviewers given the CODE, not the author's conclusions; one per area,
 3–4 per round, read-only, each in its own scratch folder; findings with file:line, a concrete
