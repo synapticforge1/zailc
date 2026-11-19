@@ -14,8 +14,8 @@ in [archive/done-before-0.0.1.md](archive/done-before-0.0.1.md).
   zailc's own pass in Zig for LLVM 22 IR, LLVM's code generator); how its C front end reproduces
   Fil-C clang's differences (varargs, unions with pointers, pointer atomics); which zilc C
   examples stage 2 takes first. Method: an oracle per piece, then whole programs against zilc.
-- **M1 Workspace letters H37, H38, H41, H42, H43** (2026-11-17/19): the memory migration and the
-  review standard; the remaining steps are `STATE.md` § Next.
+- **M1 Workspace letter H37** (2026-11-17): the review standard (H38, H41, H42, H43 answered 2026-11-19);
+  the steps are `STATE.md` § Next.
 - 🗓️ **Follow-ups of the 2026-11-05 release decision** (`design-decisions.md`, the `0.0.1` row):
   `build.zig.zon` reads `0.1.0` and must read `0.0.1` before the release gate opens; how a
   nightly is numbered and published; what the MVP contains.
@@ -44,5 +44,5 @@ in [archive/done-before-0.0.1.md](archive/done-before-0.0.1.md).
 The letters live in `../workspace/cmem/letters/`, one file per item (letters H41, H42); the session
 routine in `working-rules.md` says when to read them. Answered and awaiting the creator's close
 (open in the workspace index, 2026-11-19): H19 (2026-10-27); H30–H34 and C37 (2026-11-12).
-Answers to H37, H38, H41, H42, H43 are open work (M1). zailc has opened one item, C28 (to zilc),
+H38, H41, H42, H43 answered 2026-11-19; H37 is open work (M1). zailc has opened one item, C28 (to zilc),
 closed by zailc 2026-11-19: zilc's answer is in the letter and its rule is on its `origin/main`.

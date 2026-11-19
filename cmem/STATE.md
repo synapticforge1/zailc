@@ -19,10 +19,9 @@ Updated: 2026-11-19, at the end of the session
 - Platforms passed: none yet
 
 ## Next
-1. On "commit": answer H38, H41, H42, H43 in the workspace letters with the commit ids
-2. H37: rewrite review-process.md to the five classes; `review-issues.md` gitignored; `platforms.md`
-3. H37 (d), (e): review set before release; tests out of CI; `surface.ts:5` pointer — own branch, rehearsed
-4. Scope stage 1, the zailc compiler on Zig 0.17.1 (open-work.md § S1)
+1. H37: rewrite review-process.md to the five classes; `review-issues.md` gitignored; `platforms.md`
+2. H37 (d), (e): review set before release; tests out of CI; `surface.ts:5` pointer — own branch, rehearsed
+3. Scope stage 1, the zailc compiler on Zig 0.17.1 (open-work.md § S1)
 
 ## Waiting on owner
 - The `0.0.1` follow-ups: nightly numbering, what the MVP contains
