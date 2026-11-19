@@ -25,7 +25,6 @@ Updated: 2026-11-19, at the end of the session
 4. Scope stage 1, the zailc compiler on Zig 0.17.1 (open-work.md § S1)
 
 ## Waiting on owner
-- Whether to clear `~/zailc-work` in WSL: 8.8 GB, nearly all written 2026-10-08 → 10-22 for the 0.686 tree
 - The `0.0.1` follow-ups: nightly numbering, what the MVP contains
 - The ★ best-practices copy (held as is, letter H38)
 - The pre-purge commits GitHub still serves by hash: a GitHub Support request

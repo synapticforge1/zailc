@@ -65,8 +65,8 @@ floor: `../workspace/cmem/working-rules.md` and `tooling-rules.md`; this repo's 
 - "commit" ends with an empty scratchpad. Sub-agents work under the main session's scratchpad,
   and the main session removes their folders; a reviewer's brief says so.
 - The WSL work area `~/zailc-work` is a cache and build area, not scratch: a session that adds a
-  folder there removes it when its item is cleared. Its size is measured in `STATE.md`'s
-  "Waiting on owner" until cleaned.
+  folder there removes it when its item is cleared. Kept there (2026-11-19, 1.8 GB): the folders the
+  tools read or write (`gen`, `link`, `out`, `ref`, `tools-check`, the Zig caches) and W-7's evidence.
 - Project notes live in `cmem/`, never only in the assistant's per-project memory folder.
 
 ## Owner commands: "commit", "push", "release" (owner, 2026-11-10)
