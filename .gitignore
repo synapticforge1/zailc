@@ -12,3 +12,6 @@ zig-out/
 # The tools' type-check installs into a copy in ~/zailc-work (tools/dev/typecheck.ts); this catches
 # an install run in the checkout itself.
 node_modules/
+# The root CLAUDE.md points at cmem/STATE.md and cmem/INDEX.md only, and is never tracked
+# (workspace memory guide, letter H38).
+/CLAUDE.md

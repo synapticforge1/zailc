@@ -25,7 +25,7 @@ Selected 2026-10-08 (owner: "copy in the ones that are relevant to our specific 
   (a CI step). Pass shell text to WSL as an argument list, never inline through PowerShell
   quoting: a `grep -E "a|b"` sent inline became shell pipes, and a watcher looped on errors for an
   hour (zilc KI-1, 2026-10-01). Throwaway scripts are Bun files in the session scratchpad.
-  This is the workspace rule too (🔒 owner, 2026-10-22, `../cmem/working-rules.md` § Tooling 1;
+  This is the workspace rule too (🔒 owner, 2026-10-22, `../workspace/cmem/tooling-rules.md` rule 1;
   letter H15): a COMMITTED script for repeated use is written in the repo language's own
   scripting mechanism, else TypeScript on Bun; a mechanism that has to build an executable does
   not count, so for Zig (`zig run` builds one) it is Bun. **`build.zig` and the Zig it compiles
@@ -232,7 +232,7 @@ Selected 2026-10-08 (owner: "copy in the ones that are relevant to our specific 
   cmem by path and heading) in the same commit (binaryang).
 - **Open-items lists cover zailc only**; closed topics are dropped, not re-listed in another form.
 - 🔒 **No secrets or personal information are ever made public** (workspace owner rule,
-  2026-10-22; full text `../cmem/working-rules.md` § Records). Everything committed is public,
+  2026-10-22; full text `../workspace/cmem/working-rules.md` § Records). Everything committed is public,
   `cmem/` included. Never in a committed file, commit message, release, issue or PR: tokens,
   keys, passwords; email addresses, machine names, private account names; **personal drive
   paths**. **The path test is "is it machine-specific?", not "is it absolute?"** (owner,

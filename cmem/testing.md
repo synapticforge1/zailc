@@ -5,45 +5,229 @@ exact command.
 
 ## Gates
 
-| gate | command (from the repo, inside WSL; or via the Bun tool from Windows) | what it proves |
-| --- | --- | --- |
-| tools type-check | `bun run tools/dev/typecheck.ts` (also a CI step) | every tool type-checks under `tsc` with `@types/bun`, both pinned in `tools/bun.lock` (`bun install --frozen-lockfile` on a copy in `$WORK/tools-check`) |
-| surface snapshot | `bun run tools/release/surface.ts --check` (also a CI step; runs on Windows, no build) | the surface extracted from the source equals the committed `tools/release/surface.txt`, so a surface change arrives only as a re-baseline commit (`releasing.md` § "The compatibility gate"). Inverted 2026-10-27, 16/16 |
-| unit tests | `zig build test` (Zig 0.15.2; add `--cache-dir ~/zailc-work/zig-cache --global-cache-dir ~/zailc-work/zig-global-cache` on the exFAT checkout) | `sig.zig` helpers; the tables validate and have 453 + 13 rows; both generated files have Ruby's exact length and SHA-256 |
-| Ruby diff | `bun run tools/gen/verify-forwarders.ts` | `zailc-gen` and a live run of upstream's Ruby script produce identical bytes |
-| musl headers | `bun run tools/gen/verify-musl-headers.ts` | `zailc-gen musl-headers` and upstream's `./configure && make install-headers` produce identical trees (`diff -r`) |
-| link and run | `bun run tools/runtime/link-run.ts [name ...]` | every `tests/link/` program (and every `// expect: exit N with <flags>` variant) behaves identically linked against upstream's runtime and against ours, with the expected exit code; the link map proves ours contains only our libpas objects, the five `fil-pizlo-*.o`, our `filc_crt.o` and our `libyolounwind.a` |
-| zilc's corpus | `bun run tools/runtime/corpus-run.ts ["c zig"] [name ...]` (MODE, JOBS) | every program of zilc's `tests/basics`, built by zilc, behaves the same against upstream's runtime and ours: SAME, or VARIES-SAME-SHAPE when its two stock runs differ by themselves; BUILD-FAIL / LINK-FAIL count as failures |
-| compiler-rt | `bun run tools/runtime/verify-compiler-rt.ts` | `zig build compiler-rt` succeeds; libyolort.a's members match upstream's in order with upstream's defined globals and binding; undefined differences only W-8's compiler-rt sets (14 objects); exactly W-10's two extra definitions; crtbegin.o/crtend.o likewise |
-| yolo musl | `bun run tools/runtime/verify-yolomusl.ts` | `zig build yolomusl` succeeds; libyoloc.a's members match upstream's in order, each defines upstream's globals with the same binding, undefined differences only W-8's set (budget 28), compile-unit names upstream's (one empty TU, budget 1); the crt objects likewise; libyolom.a empty in both |
-| libpas symbols | `bun run tools/runtime/verify-libpas.ts` | `zig build libpas` succeeds with upstream's flags, and every object (178 in `libpizlo-stock.a`, plus `filc_crt.o`, `filc_mincrt.o`, `libyolounwind.a`) defines exactly the global symbols of the release tarball's upstream-built object, every upstream object has one of ours, and the undefined-symbol differences are exactly `KNOWN_UNDEF_DIFFS` (a ratchet: new or vanished fails); every source path an object carries is in upstream's form (relative, resolving from `libpas/`; W-6), and assert-presence differences equal `PATH_PRESENCE_BUDGET` (16) |
+Each item: **gate** — command (from the repo, inside WSL; or via the Bun tool from Windows).
+
+- **tools type-check** — `bun run tools/dev/typecheck.ts` (also a CI step)
+  *what it proves:* every tool type-checks under `tsc` with `@types/bun`, both pinned in `tools/bun.lock`
+  (`bun install --frozen-lockfile` on a copy in `$WORK/tools-check`)
+
+- **surface snapshot** — `bun run tools/release/surface.ts --check` (also a CI step; runs on Windows, no
+  build)
+  *what it proves:* the surface extracted from the source equals the committed `tools/release/surface.txt`, so
+  a surface change arrives only as a re-baseline commit (`releasing.md` § "The compatibility gate"). Inverted
+  2026-10-27, 16/16
+
+- **unit tests** — `zig build test` (Zig 0.15.2; add `--cache-dir ~/zailc-work/zig-cache --global-cache-dir
+  ~/zailc-work/zig-global-cache` on the exFAT checkout)
+  *what it proves:* `sig.zig` helpers; the tables validate and have 453 + 13 rows; both generated files have
+  Ruby's exact length and SHA-256
+
+- **Ruby diff** — `bun run tools/gen/verify-forwarders.ts`
+  *what it proves:* `zailc-gen` and a live run of upstream's Ruby script produce identical bytes
+
+- **musl headers** — `bun run tools/gen/verify-musl-headers.ts`
+  *what it proves:* `zailc-gen musl-headers` and upstream's `./configure && make install-headers` produce
+  identical trees (`diff -r`)
+
+- **link and run** — `bun run tools/runtime/link-run.ts [name ...]`
+  *what it proves:* every `tests/link/` program (and every `// expect: exit N with <flags>` variant) behaves
+  identically linked against upstream's runtime and against ours, with the expected exit code; the link map
+  proves ours contains only our libpas objects, the five `fil-pizlo-*.o`, our `filc_crt.o` and our
+  `libyolounwind.a`
+
+- **zilc's corpus** — `bun run tools/runtime/corpus-run.ts ["c zig"] [name ...]` (MODE, JOBS)
+  *what it proves:* every program of zilc's `tests/basics`, built by zilc, behaves the same against upstream's
+  runtime and ours: SAME, or VARIES-SAME-SHAPE when its two stock runs differ by themselves; BUILD-FAIL /
+  LINK-FAIL count as failures
+
+- **compiler-rt** — `bun run tools/runtime/verify-compiler-rt.ts`
+  *what it proves:* `zig build compiler-rt` succeeds; libyolort.a's members match upstream's in order with
+  upstream's defined globals and binding; undefined differences only W-8's compiler-rt sets (14 objects);
+  exactly W-10's two extra definitions; crtbegin.o/crtend.o likewise
+
+- **yolo musl** — `bun run tools/runtime/verify-yolomusl.ts`
+  *what it proves:* `zig build yolomusl` succeeds; libyoloc.a's members match upstream's in order, each
+  defines upstream's globals with the same binding, undefined differences only W-8's set (budget 28),
+  compile-unit names upstream's (one empty TU, budget 1); the crt objects likewise; libyolom.a empty in both
+
+- **libpas symbols** — `bun run tools/runtime/verify-libpas.ts`
+  *what it proves:* `zig build libpas` succeeds with upstream's flags, and every object (178 in
+  `libpizlo-stock.a`, plus `filc_crt.o`, `filc_mincrt.o`, `libyolounwind.a`) defines exactly the global
+  symbols of the release tarball's upstream-built object, every upstream object has one of ours, and the
+  undefined-symbol differences are exactly `KNOWN_UNDEF_DIFFS` (a ratchet: new or vanished fails); every
+  source path an object carries is in upstream's form (relative, resolving from `libpas/`; W-6), and
+  assert-presence differences equal `PATH_PRESENCE_BUDGET` (16)
 
 ## Results
 
-| date | gate | result |
-| --- | --- | --- |
-| 2026-10-22 | GitHub, first push with Bun (`2e0e650`, at `synapticforge1/zailc`) | **CI success**, every step: Format check, Install Bun 1.4.3, Type-check the tools, Unit and byte-identity tests, zailc-gen smoke. **Auto-tag success** with the gate closed: Install Bun 1.4.3 and "Read the release gate" ran; "Read version" and "Create and push the tag" skipped; Publish skipped; no tag, no release (runs 39756032494, 39756032452; read through the GitHub API) |
-| 2026-10-22 | every gate, after the Deno → Bun port (Bun 1.4.3, from Windows via `linuxOnly`) | **All pass with the recorded counts.** Importers: all four regenerate `signatures.zig`, `libpas_sources.zig`, `yolomusl_sources.zig`, `compiler_rt_sources.zig` with no diff (453 + 13; 174 + 1 + 1; 1,343 / 5 / 2; 167). Ruby diff SAME both files (SHA `8dbba100…`); musl headers 219 = 219; libpas 178/178, 177 identical, 1 known (W-4), budget 16; yolo musl 1,343 in order, 28 W-8, 1 empty TU; compiler-rt 167 in order, 13 + crtbegin W-8, 2 W-10; link-run 13/13 (12 identical + W-10); corpus 156/156 (C 65 SAME + 10 VARIES-SAME-SHAPE + 3 ANY-ORDER; Zig 66 + 9 + 3). `run()` probed under Bun: an added `env` keeps the parent's (a bare `Bun.spawn` `env` drops `HOME`), missing program 127 (both paths), SIGKILL 137, one stream in order |
-| 2026-10-22 | tools type-check (`tools/dev/typecheck.ts`, new) | **OK, 17 files** (tsc 7.0.2, @types/bun 1.4.3). First run: 2 errors, fixed (`signalCode` is `number \| Signals`; `BufferSource` is a DOM type, now `Uint8Array<ArrayBuffer>`). **Inverted**, each by content, diff printed, restored and `git diff --exit-code`: a type error in `bump.ts` → TS2322, `FAILED: tsc exit 1`, exit 1; `@types/bun` 1.4.3 → 1.4.2 in `package.json` → "lockfile had changes, but lockfile is frozen", exit 1 (a first try with `typescript` 7.0.1 failed for the WRONG reason, a version that does not exist, and was not counted) |
-| 2026-10-08 (evening) | unit tests | **11/11 passed** (two test roots: `forwarders.zig` 6, `musl_headers.zig` 5: the three mkalltypes rules, pass-through lines, the syscall.h rule). `zig fmt --check` clean |
-| 2026-10-08 (evening) | musl headers | **OK, identical**: upstream 219 files = zailc-gen 219 files, x86_64, oracle built with host clang in `~/zailc-work/ref/yolomusl` |
-| 2026-10-08 (evening) | libpas symbols | **OK**: 178 objects built (upstream's archive has 178 `pas-pizlo-release` objects), 177 identical symbol sets, 1 with only an undefined-symbol difference (`verse_heap_chunk_map_entry.o` lacks a `pas_panic` reference, W-4), 0 defined-symbol differences; `filc_crt.o`, `filc_mincrt.o` define `main`; `libyolounwind.a` the six `_Unwind_*` stubs. `libpizlo-stock.a` is 20.8 MB with debug info |
-| 2026-10-08 (late) | libpas symbols, with the ratchet | **OK, exit 0**: 178/178, 177 identical, 1 undefined difference (known: W-4), 0 new, 0 not built. **Inverted**, each mutant by content with its diff printed and the file restored: known list emptied → `NEW`, exit 1; a fake known entry → `KNOWN DIFFERENCE GONE`, exit 1; one object dropped from the comparison → `NOT BUILT`, exit 1 |
-| 2026-10-09 | compiler-rt | **Importer**: CMake (build_compiler_rt.sh's options, zig cc) gives 167 builtins with the same names IN THE SAME ORDER as the release's libyolort.a, two flag sets (164 C, 3 assembly), crtbegin/crtend at -O0. First run blocked by W-9 (a Windows ZIG_LOCAL_CACHE_DIR forwarded into WSL), fixed. **verify-compiler-rt.ts exit 0**: 167/167 in order, 14 W-8 undefined differences, 2 W-10 definitions. **W-10**: the release's own toolchain prints 1.5 -> 0x0000 -> 0.0083 (static and dynamic, exit 1); its __extendhfsf2 reads %edi, ours %xmm0; with only libyolort swapped for ours: correct, exit 0; committed repro checked as written. **link-run 13/13** with our libyolort/crtbegin/crtend (12 identical, half_float the recorded departure). **Inverted**: upstream's libyolort.a in the overlay → hash check, exit 1; the departure recording stock exit 0 → `stock exit 1, but W-10 records 0`; the departure line removed → `exit: ours 0, stock 1` (and M2 showed the summary miscounting departures: fixed) |
-| 2026-10-09 | zilc's corpus with our compiler-rt | **156/156 in one full run, exit 0** with our libyolort.a, crtbegin.o, crtend.o (and our libpas pieces and yolo musl): C 65 SAME + 10 VARIES-SAME-SHAPE + 3 SAME-LINES-ANY-ORDER; Zig 66 SAME + 9 VARIES-SAME-SHAPE + 3 SAME-LINES-ANY-ORDER; 0 differ, 0 build or link failures |
-| 2026-10-09 | yolo musl | **Importer**: 1,343 libc members, the same names in the same order as the tarball's `ar t`; 5 crt objects. **verify-yolomusl.ts exit 0**: 1,343/1,343 in order, defined symbols (with binding) equal, 28 W-8 undefined differences, 1,342 compile-unit names equal + 1 empty TU; crt objects equal; libyolom.a empty in both. **Inverted**: a member dropped from the list → MEMBER ORDER failures, exit 1; budget 27 → RATCHET, exit 1; `-ffile-prefix-map` removed → first SURVIVED (musl has no `__FILE__` strings), so compile-unit names were added, then 1,342 COMPILE UNIT NAME failures |
-| 2026-10-09 | link and run with our yolo musl | **12/12 variants identical to stock** with our libyoloc.a (388 members pulled, as stock), libyolom.a, rcrt1.o, crti.o, crtn.o. First run: all 12 "members differ", which was the instrument (a map names a member once per section; counted once each now). **Inverted**: overlay holding upstream's libyoloc.a → hash check, exit 1; rcrt1.o not swapped → `leaked /pizfix/lib/rcrt1.o`, exit 1 |
-| 2026-10-09 | zilc's corpus with our yolo musl | **156 programs, 155 matching in one full run; the 156th re-run matches**: C 65 SAME + 9 VARIES-SAME-SHAPE + 3 SAME-LINES-ANY-ORDER + 1 DIFFERS (53_random-numbers: `srand(time(NULL))` seeds one line by the second, a CLOCK_SECONDS program, reclassified with that evidence); Zig 66 SAME + 9 VARIES-SAME-SHAPE + 3 SAME-LINES-ANY-ORDER, 0 differ. Then the 12 special programs (27, 35, 36, 53, 74, 75 in both languages) re-run on their own: 12/12 through the intended path, exit 0. The first run had 3 non-matches, all non-determinism the two stock runs missed by agreeing by chance: c 35_waitgroups and zig 36_worker-pools (thread order), zig 75_spawning-processes (`date`, stock 18:48:35, ours 18:48:36). Now THREAD_ORDER (27, 35, 36: the same lines in any order) and CLOCK_SECONDS (74, 75: by shape), as zilc's EXPECTED does |
-| 2026-10-09 | `zailc-gen --version` | Prints `zailc-gen 0.1.0` / `built by Zig 0.15.2` / `forwarder tables from Fil-C 0.686 (163fae5…)`; no arguments still exit 2 with the usage; `zig fmt` clean; 11/11 tests. ci.yml's own "zailc-gen smoke" step, run from the YAML on a git archive in WSL: exit 0; **inverted** (main.zig printing 0.0.0): exit 1 with the `::error::`. publish.yml's check is the same comparison against the tag; not run locally (it runs on a release) |
-| 2026-10-09 | W-7 cause | **Confirmed** (tarball alone): pass input `lpad.i` = landingpad first; pass output = global getter + checks first, `filc_landing_pad` after; the getter's slow path sets the frame's origin to `@filc_origin` (`can_catch` 0). Predictions: global warmed before the throw → exit 0 (-O1, -O2); fresh global in the destructor → 133; both → 133. Committed repro checked: -O0 0, -O1 133, -O2 133, `-DWARM_GLOBAL_FIRST` 0 at -O1 and -O2 |
-| 2026-10-09 | W-5 fix | `zig fmt` clean; `zig build test` ok; `verify-musl-headers.ts` 219 files identical; scratch tree: unchanged `cached`, edit `success`, add `success`, unchanged `cached`; **inverted** (inputs removed) edit → `cached` (stale), restored → rerun; then on the pinned tree `verify-libpas.ts` exit 0 and `link-run.ts` 12/12 |
-| 2026-10-08 (night, at the pause) | link and run, full | **12/12 variants identical to stock, exit 0** (10 programs, with `eh_dtor_writes_global` at -O0 and -O1); every CI and auto-tag run on GitHub today green, no tag |
-| 2026-10-08 (night) | W-7 reduction (upstream alone) | Release tarball only, 13 variants at -O1/-O2 (and -O0): panics iff an inlined destructor writes a global in a frame being unwound (depth 0/1/3/10 and through an intermediate frame); passes with the destructor empty, `noinline`, or writing through a pointer; -O0 always passes. `tests/upstream/filc-0.686-landing-pad-can-catch.cpp` checked as committed: -O0 exit 0, -O1 and -O2 exit 133. `link-run.ts eh_dtor_writes_global exceptions`: 4/4 variants identical to stock |
-| 2026-10-08 (night) | zilc's corpus | **156/156, exit 0** (zilc `9794594`, ReleaseSafe, zilc's patched clang): C 68 SAME + 10 VARIES-SAME-SHAPE; Zig 69 SAME + 9 VARIES-SAME-SHAPE (32 tickers, 35 waitgroups, 36 worker pools, 37 rate limiting, 39 logging (C only), 50 time, 51 epoch, 52 time formatting, 53 random numbers, 63 temporary files); 0 DIFFERS, 0 SHAPE-DIFFERS, 0 BUILD-FAIL, 0 LINK-FAIL. zilc's repo unchanged (built from a copy). **Inverted**: our `filc_crt.o` built `USE_LIBC=0` → c 01 and 53, zig 01 DIFFERS (exit 133 vs 0), zig 53 SHAPE-DIFFERS, exit 1; the real runtime rebuilt and re-checked afterwards |
-| 2026-10-08 (night) | type-check of the tools | `deno check tools/` failed on every tool importing `tools/lib/tool.ts` (`sha256`'s `Uint8Array`, TypeScript 5.7); `deno run` never type-checks. Fixed (`BufferSource`); 11/11 pass on Windows and in WSL; now a CI step |
-| 2026-10-08 (night) | GitHub, first push with the workflows (`b331448`) | **CI success** (Format check, Unit and byte-identity tests, zailc-gen smoke); **Auto-tag success** with the gate closed: "Read the release gate" ran, "Read version" and "Create and push the tag" skipped, Publish skipped; no tag, no release (runs 37869468639, 37869468913; read through the GitHub API) |
-| 2026-10-08 (night) | release gate | **OK**: `gate.ts` (`--allow-read` only, as CI runs it) reads the real file as `closed`; accepts `open` and padded `closed`; exits 1 on `Open`, two states, comments only, a typo, a missing file. The workflows' OWN gate steps, parsed from the YAML and executed in WSL: auto-tag closed → green, `state=closed`, a notice; open → `state=open`; malformed → the run fails; `ver`/`check` run only when open; publish closed → fails with the error, open → passes, empty → fails; publish checks the gate before any build or upload (9/9). **Inverted**: auto-tag's tag step with its `if:` removed → the test FAILS. `bump.ts` names the closed gate (scratch copy) |
-| 2026-10-08 (night) | link and run | **10/10 variants identical to stock, exit 0** (9 programs; exceptions at -O0 and -O1). First runs: 4 trapping programs "varied" (pid, ASLR addresses: normalised), and `exceptions` showed our absolute `__FILE__` path in a panic (fixed, W-6) inside a panic upstream also has (W-7). **Inverted** (each mutant by content, diff printed, restored): M1 overlay holds upstream's libpizlo.a → first SURVIVED (the proof checked the overlay's path only), fixed to check members, then `wrong runtime linked`, exit 1; M2 our `filc_crt.o` built `USE_LIBC=0` → `hello` exit 133 vs 0, exit 1; M3 overlay's libyolounwind.a upstream's → hash check, exit 1 |
-| 2026-10-08 (night) | libpas symbols, with source paths | **OK, exit 0**: 0 non-upstream paths, 16 assert-presence differences (budget 16). Before the fix: 97 of 178 objects carried absolute paths. **Inverted**: `-ffile-prefix-map` replaced by a harmless `-I` (the build still succeeds) → 456 `SOURCE PATH FORM` lines, exit 1; budget 15 → `ASSERT-PRESENCE RATCHET`, exit 1. A first mutant that did not compile was discarded, not counted. The form rule checks itself on upstream's paths, which caught an extractor fault (string tails such as `_allocator.c`) |
-| 2026-10-08 | unit tests | **6/6 passed** (`zig build test --summary all`, Zig 0.15.2 in WSL, Debug): sig helpers, validate, the tables (453 + 13), `filc_native.h` 45,366 B + SHA, `filc_native_forwarders.c` 976,926 B + SHA. `zig fmt --check` clean |
-| 2026-10-08 | Ruby diff | **SAME, both files** (`deno run -A tools/gen/verify-forwarders.ts` from Windows, run in WSL against `~/zilc-work/filc-cosmo`, Ruby 3.3.8): `filc_native.h` ruby 45,366 B = zig 45,366 B; `filc_native_forwarders.c` ruby 976,926 B = zig 976,926 B; SHA-256 as in `oracle.md` |
+Each item: **date** — gate.
+
+- **2026-10-22** — GitHub, first push with Bun (`2e0e650`, at `synapticforge1/zailc`)
+  *result:* **CI success**, every step: Format check, Install Bun 1.4.3, Type-check the tools, Unit and
+  byte-identity tests, zailc-gen smoke. **Auto-tag success** with the gate closed: Install Bun 1.4.3 and "Read
+  the release gate" ran; "Read version" and "Create and push the tag" skipped; Publish skipped; no tag, no
+  release (runs 39756032494, 39756032452; read through the GitHub API)
+
+- **2026-10-22** — every gate, after the Deno → Bun port (Bun 1.4.3, from Windows via `linuxOnly`)
+  *result:* **All pass with the recorded counts.** Importers: all four regenerate `signatures.zig`,
+  `libpas_sources.zig`, `yolomusl_sources.zig`, `compiler_rt_sources.zig` with no diff (453 + 13; 174 + 1 + 1;
+  1,343 / 5 / 2; 167). Ruby diff SAME both files (SHA `8dbba100…`); musl headers 219 = 219; libpas 178/178,
+  177 identical, 1 known (W-4), budget 16; yolo musl 1,343 in order, 28 W-8, 1 empty TU; compiler-rt 167 in
+  order, 13 + crtbegin W-8, 2 W-10; link-run 13/13 (12 identical + W-10); corpus 156/156 (C 65 SAME + 10
+  VARIES-SAME-SHAPE + 3 ANY-ORDER; Zig 66 + 9 + 3). `run()` probed under Bun: an added `env` keeps the
+  parent's (a bare `Bun.spawn` `env` drops `HOME`), missing program 127 (both paths), SIGKILL 137, one stream
+  in order
+
+- **2026-10-22** — tools type-check (`tools/dev/typecheck.ts`, new)
+  *result:* **OK, 17 files** (tsc 7.0.2, @types/bun 1.4.3). First run: 2 errors, fixed (`signalCode` is
+  `number | Signals`; `BufferSource` is a DOM type, now `Uint8Array<ArrayBuffer>`). **Inverted**, each by
+  content, diff printed, restored and `git diff --exit-code`: a type error in `bump.ts` → TS2322, `FAILED: tsc
+  exit 1`, exit 1; `@types/bun` 1.4.3 → 1.4.2 in `package.json` → "lockfile had changes, but lockfile is
+  frozen", exit 1 (a first try with `typescript` 7.0.1 failed for the WRONG reason, a version that does not
+  exist, and was not counted)
+
+- **2026-10-08 (evening)** — unit tests
+  *result:* **11/11 passed** (two test roots: `forwarders.zig` 6, `musl_headers.zig` 5: the three mkalltypes
+  rules, pass-through lines, the syscall.h rule). `zig fmt --check` clean
+
+- **2026-10-08 (evening)** — musl headers
+  *result:* **OK, identical**: upstream 219 files = zailc-gen 219 files, x86_64, oracle built with host clang
+  in `~/zailc-work/ref/yolomusl`
+
+- **2026-10-08 (evening)** — libpas symbols
+  *result:* **OK**: 178 objects built (upstream's archive has 178 `pas-pizlo-release` objects), 177 identical
+  symbol sets, 1 with only an undefined-symbol difference (`verse_heap_chunk_map_entry.o` lacks a `pas_panic`
+  reference, W-4), 0 defined-symbol differences; `filc_crt.o`, `filc_mincrt.o` define `main`;
+  `libyolounwind.a` the six `_Unwind_*` stubs. `libpizlo-stock.a` is 20.8 MB with debug info
+
+- **2026-10-08 (late)** — libpas symbols, with the ratchet
+  *result:* **OK, exit 0**: 178/178, 177 identical, 1 undefined difference (known: W-4), 0 new, 0 not built.
+  **Inverted**, each mutant by content with its diff printed and the file restored: known list emptied →
+  `NEW`, exit 1; a fake known entry → `KNOWN DIFFERENCE GONE`, exit 1; one object dropped from the comparison
+  → `NOT BUILT`, exit 1
+
+- **2026-10-09** — compiler-rt
+  *result:* **Importer**: CMake (build_compiler_rt.sh's options, zig cc) gives 167 builtins with the same
+  names IN THE SAME ORDER as the release's libyolort.a, two flag sets (164 C, 3 assembly), crtbegin/crtend at
+  -O0. First run blocked by W-9 (a Windows ZIG_LOCAL_CACHE_DIR forwarded into WSL), fixed.
+  **verify-compiler-rt.ts exit 0**: 167/167 in order, 14 W-8 undefined differences, 2 W-10 definitions.
+  **W-10**: the release's own toolchain prints 1.5 -> 0x0000 -> 0.0083 (static and dynamic, exit 1); its
+  __extendhfsf2 reads %edi, ours %xmm0; with only libyolort swapped for ours: correct, exit 0; committed repro
+  checked as written. **link-run 13/13** with our libyolort/crtbegin/crtend (12 identical, half_float the
+  recorded departure). **Inverted**: upstream's libyolort.a in the overlay → hash check, exit 1; the departure
+  recording stock exit 0 → `stock exit 1, but W-10 records 0`; the departure line removed → `exit: ours 0,
+  stock 1` (and M2 showed the summary miscounting departures: fixed)
+
+- **2026-10-09** — zilc's corpus with our compiler-rt
+  *result:* **156/156 in one full run, exit 0** with our libyolort.a, crtbegin.o, crtend.o (and our libpas
+  pieces and yolo musl): C 65 SAME + 10 VARIES-SAME-SHAPE + 3 SAME-LINES-ANY-ORDER; Zig 66 SAME + 9
+  VARIES-SAME-SHAPE + 3 SAME-LINES-ANY-ORDER; 0 differ, 0 build or link failures
+
+- **2026-10-09** — yolo musl
+  *result:* **Importer**: 1,343 libc members, the same names in the same order as the tarball's `ar t`; 5 crt
+  objects. **verify-yolomusl.ts exit 0**: 1,343/1,343 in order, defined symbols (with binding) equal, 28 W-8
+  undefined differences, 1,342 compile-unit names equal + 1 empty TU; crt objects equal; libyolom.a empty in
+  both. **Inverted**: a member dropped from the list → MEMBER ORDER failures, exit 1; budget 27 → RATCHET,
+  exit 1; `-ffile-prefix-map` removed → first SURVIVED (musl has no `__FILE__` strings), so compile-unit names
+  were added, then 1,342 COMPILE UNIT NAME failures
+
+- **2026-10-09** — link and run with our yolo musl
+  *result:* **12/12 variants identical to stock** with our libyoloc.a (388 members pulled, as stock),
+  libyolom.a, rcrt1.o, crti.o, crtn.o. First run: all 12 "members differ", which was the instrument (a map
+  names a member once per section; counted once each now). **Inverted**: overlay holding upstream's libyoloc.a
+  → hash check, exit 1; rcrt1.o not swapped → `leaked /pizfix/lib/rcrt1.o`, exit 1
+
+- **2026-10-09** — zilc's corpus with our yolo musl
+  *result:* **156 programs, 155 matching in one full run; the 156th re-run matches**: C 65 SAME + 9
+  VARIES-SAME-SHAPE + 3 SAME-LINES-ANY-ORDER + 1 DIFFERS (53_random-numbers: `srand(time(NULL))` seeds one
+  line by the second, a CLOCK_SECONDS program, reclassified with that evidence); Zig 66 SAME + 9
+  VARIES-SAME-SHAPE + 3 SAME-LINES-ANY-ORDER, 0 differ. Then the 12 special programs (27, 35, 36, 53, 74, 75
+  in both languages) re-run on their own: 12/12 through the intended path, exit 0. The first run had 3
+  non-matches, all non-determinism the two stock runs missed by agreeing by chance: c 35_waitgroups and zig
+  36_worker-pools (thread order), zig 75_spawning-processes (`date`, stock 18:48:35, ours 18:48:36). Now
+  THREAD_ORDER (27, 35, 36: the same lines in any order) and CLOCK_SECONDS (74, 75: by shape), as zilc's
+  EXPECTED does
+
+- **2026-10-09** — `zailc-gen --version`
+  *result:* Prints `zailc-gen 0.1.0` / `built by Zig 0.15.2` / `forwarder tables from Fil-C 0.686 (163fae5…)`;
+  no arguments still exit 2 with the usage; `zig fmt` clean; 11/11 tests. ci.yml's own "zailc-gen smoke" step,
+  run from the YAML on a git archive in WSL: exit 0; **inverted** (main.zig printing 0.0.0): exit 1 with the
+  `::error::`. publish.yml's check is the same comparison against the tag; not run locally (it runs on a
+  release)
+
+- **2026-10-09** — W-7 cause
+  *result:* **Confirmed** (tarball alone): pass input `lpad.i` = landingpad first; pass output = global getter
+  + checks first, `filc_landing_pad` after; the getter's slow path sets the frame's origin to `@filc_origin`
+  (`can_catch` 0). Predictions: global warmed before the throw → exit 0 (-O1, -O2); fresh global in the
+  destructor → 133; both → 133. Committed repro checked: -O0 0, -O1 133, -O2 133, `-DWARM_GLOBAL_FIRST` 0 at
+  -O1 and -O2
+
+- **2026-10-09** — W-5 fix
+  *result:* `zig fmt` clean; `zig build test` ok; `verify-musl-headers.ts` 219 files identical; scratch tree:
+  unchanged `cached`, edit `success`, add `success`, unchanged `cached`; **inverted** (inputs removed) edit →
+  `cached` (stale), restored → rerun; then on the pinned tree `verify-libpas.ts` exit 0 and `link-run.ts`
+  12/12
+
+- **2026-10-08 (night, at the pause)** — link and run, full
+  *result:* **12/12 variants identical to stock, exit 0** (10 programs, with `eh_dtor_writes_global` at -O0
+  and -O1); every CI and auto-tag run on GitHub today green, no tag
+
+- **2026-10-08 (night)** — W-7 reduction (upstream alone)
+  *result:* Release tarball only, 13 variants at -O1/-O2 (and -O0): panics iff an inlined destructor writes a
+  global in a frame being unwound (depth 0/1/3/10 and through an intermediate frame); passes with the
+  destructor empty, `noinline`, or writing through a pointer; -O0 always passes.
+  `tests/upstream/filc-0.686-landing-pad-can-catch.cpp` checked as committed: -O0 exit 0, -O1 and -O2 exit
+  133. `link-run.ts eh_dtor_writes_global exceptions`: 4/4 variants identical to stock
+
+- **2026-10-08 (night)** — zilc's corpus
+  *result:* **156/156, exit 0** (zilc `9794594`, ReleaseSafe, zilc's patched clang): C 68 SAME + 10
+  VARIES-SAME-SHAPE; Zig 69 SAME + 9 VARIES-SAME-SHAPE (32 tickers, 35 waitgroups, 36 worker pools, 37 rate
+  limiting, 39 logging (C only), 50 time, 51 epoch, 52 time formatting, 53 random numbers, 63 temporary
+  files); 0 DIFFERS, 0 SHAPE-DIFFERS, 0 BUILD-FAIL, 0 LINK-FAIL. zilc's repo unchanged (built from a copy).
+  **Inverted**: our `filc_crt.o` built `USE_LIBC=0` → c 01 and 53, zig 01 DIFFERS (exit 133 vs 0), zig 53
+  SHAPE-DIFFERS, exit 1; the real runtime rebuilt and re-checked afterwards
+
+- **2026-10-08 (night)** — type-check of the tools
+  *result:* `deno check tools/` failed on every tool importing `tools/lib/tool.ts` (`sha256`'s `Uint8Array`,
+  TypeScript 5.7); `deno run` never type-checks. Fixed (`BufferSource`); 11/11 pass on Windows and in WSL; now
+  a CI step
+
+- **2026-10-08 (night)** — GitHub, first push with the workflows (`b331448`)
+  *result:* **CI success** (Format check, Unit and byte-identity tests, zailc-gen smoke); **Auto-tag success**
+  with the gate closed: "Read the release gate" ran, "Read version" and "Create and push the tag" skipped,
+  Publish skipped; no tag, no release (runs 37869468639, 37869468913; read through the GitHub API)
+
+- **2026-10-08 (night)** — release gate
+  *result:* **OK**: `gate.ts` (`--allow-read` only, as CI runs it) reads the real file as `closed`; accepts
+  `open` and padded `closed`; exits 1 on `Open`, two states, comments only, a typo, a missing file. The
+  workflows' OWN gate steps, parsed from the YAML and executed in WSL: auto-tag closed → green,
+  `state=closed`, a notice; open → `state=open`; malformed → the run fails; `ver`/`check` run only when open;
+  publish closed → fails with the error, open → passes, empty → fails; publish checks the gate before any
+  build or upload (9/9). **Inverted**: auto-tag's tag step with its `if:` removed → the test FAILS. `bump.ts`
+  names the closed gate (scratch copy)
+
+- **2026-10-08 (night)** — link and run
+  *result:* **10/10 variants identical to stock, exit 0** (9 programs; exceptions at -O0 and -O1). First runs:
+  4 trapping programs "varied" (pid, ASLR addresses: normalised), and `exceptions` showed our absolute
+  `__FILE__` path in a panic (fixed, W-6) inside a panic upstream also has (W-7). **Inverted** (each mutant by
+  content, diff printed, restored): M1 overlay holds upstream's libpizlo.a → first SURVIVED (the proof checked
+  the overlay's path only), fixed to check members, then `wrong runtime linked`, exit 1; M2 our `filc_crt.o`
+  built `USE_LIBC=0` → `hello` exit 133 vs 0, exit 1; M3 overlay's libyolounwind.a upstream's → hash check,
+  exit 1
+
+- **2026-10-08 (night)** — libpas symbols, with source paths
+  *result:* **OK, exit 0**: 0 non-upstream paths, 16 assert-presence differences (budget 16). Before the fix:
+  97 of 178 objects carried absolute paths. **Inverted**: `-ffile-prefix-map` replaced by a harmless `-I` (the
+  build still succeeds) → 456 `SOURCE PATH FORM` lines, exit 1; budget 15 → `ASSERT-PRESENCE RATCHET`, exit 1.
+  A first mutant that did not compile was discarded, not counted. The form rule checks itself on upstream's
+  paths, which caught an extractor fault (string tails such as `_allocator.c`)
+
+- **2026-10-08** — unit tests
+  *result:* **6/6 passed** (`zig build test --summary all`, Zig 0.15.2 in WSL, Debug): sig helpers, validate,
+  the tables (453 + 13), `filc_native.h` 45,366 B + SHA, `filc_native_forwarders.c` 976,926 B + SHA. `zig fmt
+  --check` clean
+
+- **2026-10-08** — Ruby diff
+  *result:* **SAME, both files** (`deno run -A tools/gen/verify-forwarders.ts` from Windows, run in WSL
+  against `~/zilc-work/filc-cosmo`, Ruby 3.3.8): `filc_native.h` ruby 45,366 B = zig 45,366 B;
+  `filc_native_forwarders.c` ruby 976,926 B = zig 976,926 B; SHA-256 as in `oracle.md`

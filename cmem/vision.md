@@ -41,13 +41,24 @@ zail language"; the order of work: `roadmap.md` § "The order of work".
 
 ## How zailc differs from zilc
 
-| | zilc | zailc |
-| --- | --- | --- |
-| purpose | the stable, upstream-faithful reference; follows Fil-C releases and the Zig whose LLVM matches; Linux x86_64 only; since 2026-10-27 also the faithful pure-Zig build | a clean-slate implementation in the latest Zig that reads zilc: fixes and clean-ups where upstream left them, other platforms, the latest Zig, the zail language |
-| version line | `<Zig>-<Fil-C>.<release>`, moves with upstream | **the latest Zig, 0.17.1** — the clean-slate implementation is written for it from the start (owner, 2026-11-05; the path ran 0.15.2 → 0.17.0 → 0.17.1); releases: nightlies, then `0.0.1` (the MVP) |
-| role in testing | the oracle and the source of test examples: its results are what zailc must reproduce | the subject: zilc's tests, translated into the latest Zig, must give zilc's results (the same result, not the same bytes) |
-| the pass | Fil-C's; ported to Zig as its Z2 (since 2026-10-27), for its own LLVM | its own pass in Zig, for the latest Zig's LLVM (22 on 0.17.x) |
-| development | | AI-assisted, with every decision and its why recorded in `cmem/` |
+- **purpose** — the stable, upstream-faithful reference; follows Fil-C releases and the Zig whose LLVM
+  matches; Linux x86_64 only; since 2026-10-27 also the faithful pure-Zig build
+  *zailc:* a clean-slate implementation in the latest Zig that reads zilc: fixes and clean-ups where upstream
+  left them, other platforms, the latest Zig, the zail language
+
+- **version line** — `<Zig>-<Fil-C>.<release>`, moves with upstream
+  *zailc:* **the latest Zig, 0.17.1** — the clean-slate implementation is written for it from the start
+  (owner, 2026-11-05; the path ran 0.15.2 → 0.17.0 → 0.17.1); releases: nightlies, then `0.0.1` (the MVP)
+
+- **role in testing** — the oracle and the source of test examples: its results are what zailc must reproduce
+  *zailc:* the subject: zilc's tests, translated into the latest Zig, must give zilc's results (the same
+  result, not the same bytes)
+
+- **the pass** — Fil-C's; ported to Zig as its Z2 (since 2026-10-27), for its own LLVM
+  *zailc:* its own pass in Zig, for the latest Zig's LLVM (22 on 0.17.x)
+
+- **development** —
+  *zailc:* AI-assisted, with every decision and its why recorded in `cmem/`
 
 "Zag where they zig" is a licence to depart from upstream's design where it is a mess, not from
 its behaviour: a departure is allowed once the faithful version exists and is proven against the

@@ -19,7 +19,9 @@ Every workaround gets an entry **when it is made**, with these headings: **Sympt
 found**, **Recognising a relative**, **Cost and exit**, **Where**.
 
 **An upstream defect (in Zig, zilc or Fil-C) is documented in full BEFORE its workaround or fix**
-(owner, 2026-10-08: "if we find a defect in the upstream code whether zig or zilc or Fil-C, we will fully document what the defect is, why it is a defect, and how we confirmed it to be so. Then we will document our work around or fix to correct the defect found."). Its entry carries, in this order:
+(owner, 2026-10-08: "if we find a defect in the upstream code whether zig or zilc or Fil-C, we will fully
+document what the defect is, why it is a defect, and how we confirmed it to be so. Then we will document our
+work around or fix to correct the defect found."). Its entry carries, in this order:
 
 1. **The defect.** What goes wrong, in which upstream, at which version and commit, with the exact
    text and exit code, and the smallest program or input that shows it.
